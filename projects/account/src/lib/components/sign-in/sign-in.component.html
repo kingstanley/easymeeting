@@ -1,0 +1,20 @@
+<mat-card id="signin">
+  <form [formGroup]="signinForm">
+    <mat-icon class="mat-28">account_circle</mat-icon> Sign In
+    <mat-form-field class="input">
+      <mat-label>UserName</mat-label>
+      <!-- <mat-icon matPreffix>account_circle</mat-icon> -->
+      <input id="usname" type="text" placeholder="Enter your email or phone number" matInput formControlName="email">
+    </mat-form-field>
+    <mat-form-field class="input">
+      <mat-label>Password</mat-label>
+      <!-- <mat-icon matPreffix>lock</mat-icon> -->
+      <input id="password" type="password" placeholder="Enter your password" matInput formControlName="password">
+    </mat-form-field>
+    <meet-button (emitSubmit)="submit()" [isProcessing]="isProcessing" label="Signin" color="warn" iconColor="warn">
+    </meet-button>
+    <div>
+      No account? <button mat-button (click)="toggle()">Sign up</button>
+    </div>
+  </form>
+</mat-card>

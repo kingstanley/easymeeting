@@ -2,6 +2,23 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "angular-material": [
+        "dist/angular-material"
+      ],
+      "dashboard": [
+        "dist/dashboard"
+      ],
+      "dto": [
+        "dist/dto"
+      ],
+      "live": [
+        "dist/live"
+      ],
+      "shared": [
+        "dist/shared"
+      ]
+    },
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,

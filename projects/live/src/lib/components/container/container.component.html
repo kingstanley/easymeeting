@@ -1,0 +1,47 @@
+<header>
+  <mat-toolbar>
+    <span>Easy Meeting</span>
+  </mat-toolbar>
+</header>
+<mat-card>
+  <mat-card-content>
+    <div class="row">
+      <section class="col-md-6">
+        <meet-carousel [items]="carouselItems" [style]="carouselStyle"></meet-carousel>
+        <!-- <img src="assets/look-your-best-on-video-call.jpg" alt="" style="max-width:600px;border-radius: 100px;"> -->
+
+      </section>
+      <section class="col-md-6 d-flex flex-column justify-content-center">
+        <h1>Easy quality video meeting </h1>
+        <h1>for everyone</h1>
+        <h3>A well crafted meeting software with security in mind for organizations and individuals</h3>
+        <div class="actions">
+          <button color="warn" mat-button #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="createMenu"
+            (mouseenter)="mouseEnterMenu(menuTrigger)" (mouseleave)="mouseLeaveMenu(menuTrigger)">
+            <mat-icon *ngIf="!isProcessing">video_call</mat-icon>
+            <span *ngIf="!isProcessing">New meeting</span>
+            <mat-spinner *ngIf="isProcessing" mode="indeterminate" color="primary" strokeWidth="3" diameter="35">
+            </mat-spinner>
+          </button>
+
+          <mat-menu #createMenu="matMenu">
+            <button mat-menu-item *ngFor="let item of createMenuItems" (click)="handleCreateMenu(item)">
+              {{item}}
+            </button>
+
+          </mat-menu>
+          <mat-form-field>
+            <mat-icon class="mat-18" matSuffix>video</mat-icon>
+            <input [formControl]="meetLinkControl" matInput placeholder="Enter a code or link">
+          </mat-form-field>
+
+
+          <button mat-button *ngIf="showJoinButton" (click)="joinMeeting()">Join</button>
+          <button mat-button *ngIf="!showJoinButton">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+        </div>
+      </section>
+    </div>
+
+  </mat-card-content>
+
+</mat-card>

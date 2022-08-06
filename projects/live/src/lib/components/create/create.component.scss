@@ -1,0 +1,27 @@
+#create {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: auto;
+}
+
+.form-card {
+  // background-color: white;
+  // color: rgb(62, 58, 58);
+  border-color: white;
+}
+
+.mat-form-field {
+  width: 90%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  width: fit-content;
+  padding: 20px;
+}

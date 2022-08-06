@@ -1,0 +1,40 @@
+<mat-card id="create">
+  <mat-card class="form-card">
+    <form [formGroup]="createForm">
+      <h3>Create Meeting</h3>
+      <div style="display: flex;flex-direction: row; gap:20px; margin: 20px;">
+        <mat-input-container>
+          <mat-form-field appearance="outline">
+            <mat-label>Choose a date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker (selectedChanged)="selectMeetingDate($event)"></mat-datepicker>
+          </mat-form-field>
+        </mat-input-container>
+        <mat-form-field appearance="outline">
+          <input type="time" name="startTime" id="startTime" matInput placeholder="Start Time"
+            formControlName="startTime">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <input type="time" name="endTime" id="endTime" matInput placeholder="End Time" formControlName="endTime">
+        </mat-form-field>
+
+      </div>
+      <mat-form-field class="input" appearance="fill">
+        <mat-label>Title</mat-label>
+        <!-- <mat-icon matPreffix>account_circle</mat-icon> -->
+        <input id="title" type="text" placeholder="Enter your meeting title" matInput formControlName="title">
+      </mat-form-field>
+      <mat-form-field class="input" appearance="fill">
+        <mat-label>Description</mat-label>
+        <!-- <mat-icon matPreffix>lock</mat-icon> -->
+        <textarea id="description" type="text" placeholder="Enter meeting description" matInput
+          formControlName="description"></textarea>
+      </mat-form-field>
+      <meet-button (emitSubmit)="submit()" [isProcessing]="isProcessing" label="Submit" color="warn" iconColor="warn">
+      </meet-button>
+
+    </form>
+  </mat-card>
+</mat-card>

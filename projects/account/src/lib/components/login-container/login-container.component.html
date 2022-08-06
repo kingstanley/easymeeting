@@ -1,0 +1,6 @@
+<mat-card class="content">
+
+  <meet-signin *ngIf="!toggleForm" (emitToggle)="toggle($event)"></meet-signin>
+
+  <meet-sign-up *ngIf="toggleForm" (emitToggle)="toggle($event)"></meet-sign-up>
+</mat-card>

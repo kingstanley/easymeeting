@@ -1,0 +1,13 @@
+<div id="carousel">
+  <button mat-icon-button (click)="prev()">
+    <mat-icon class="mat-18">keyboard_arrow_left</mat-icon>
+  </button>
+  <div class="container">
+    <img [src]="selectedItem.src" [style]="style" class="img-fluid">
+    <span class="desc">{{selectedItem.description}}</span>
+  </div>
+  <button mat-icon-button (click)="next()">
+    <mat-icon class="mat-18">keyboard_arrow_right</mat-icon>
+  </button>
+
+</div>

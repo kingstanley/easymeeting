@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  // position: relative;
+  width: fit-content;
+}
+
+@media screen and (max-width:800) {
+  img {
+    max-width: 90%;
+  }
+}
+
+.prev {
+  left: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+#carousel {
+  margin: 100px auto;
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+  width: auto;
+  position: relative;
+}
+
+.desc {
+  margin-top: -50px;
+  background-color: rgba(69, 67, 67, 0.5);
+}

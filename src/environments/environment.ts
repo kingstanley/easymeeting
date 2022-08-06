@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiUrl: 'https://meeteasy.herokuapp.com/api/',
+  socketUrl: 'http://localhost:9000',
+  peerUrl: 'http://localhost:9000',
 };
 
 /*

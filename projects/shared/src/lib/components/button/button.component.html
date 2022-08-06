@@ -1,0 +1,11 @@
+<button mat-raised-button (click)="submit()" [color]="color">
+  <mat-progress-spinner
+  *ngIf="isProcessing" mode="indeterminate" strokeWidth="4"
+   diameter="35" [color]="iconColor">
+  </mat-progress-spinner>
+  <div *ngIf="!isProcessing">
+    <!-- <mat-icon  [color]="iconColor">{{icon}}</mat-icon> -->
+    {{label}}
+  </div>
+
+</button>
