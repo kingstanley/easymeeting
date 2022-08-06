@@ -11,13 +11,12 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
-import { NxWelcomeComponent } from './nx-welcome.component';
 import { TokenInterceptorService } from './shared/token-interceptor.service';
 
 const config: SocketIoConfig = { url: environment.socketUrl, options: {} };
 
 @NgModule({
-  declarations: [AppComponent, NxWelcomeComponent, HomeComponent],
+  declarations: [AppComponent, HomeComponent],
   imports: [
     AngularMaterialModule,
     BrowserModule,
