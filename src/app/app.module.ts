@@ -4,16 +4,18 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularMaterialModule } from 'projects/angular-material/src';
 // import { DashboardModule } from 'projects/dashboard/src';
-import { SharedModule } from 'projects/shared/src';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
-import { LiveModule } from 'projects/live/src';
+import { SharedModule } from 'projects/shared/src';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { TokenInterceptorService } from './shared/token-interceptor.service';
 
-const config: SocketIoConfig = { url: environment.socketUrl, options: {} };
+const config: SocketIoConfig = {
+  url: environment.socketUrl,
+  options: { transports: ['websocket'] },
+};
 
 @NgModule({
   declarations: [AppComponent, HomeComponent],
