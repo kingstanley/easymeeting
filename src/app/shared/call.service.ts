@@ -34,7 +34,6 @@ export class CallService {
         const id = uuidv4();
         this.peer = new Peer(id, {
           host: environment.peerUrl,
-          path: '/',
         });
 
         console.log('peerId: ', this.peer.id);
