@@ -14,7 +14,7 @@ import { TokenInterceptorService } from './shared/token-interceptor.service';
 
 const config: SocketIoConfig = {
   url: environment.socketUrl,
-  options: { transports: ['websocket'] },
+  options: {},
 };
 
 @NgModule({
