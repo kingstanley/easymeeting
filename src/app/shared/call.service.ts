@@ -17,7 +17,7 @@ export class CallService {
   public initPeer() {
     if (!this.peer || this.peer.disconnected) {
       const peerJsOptions = {
-        host: environment.peerUrl,
+        host: environment.peerHost,
         debug: 3,
         config: {
           iceServers: [
@@ -32,7 +32,11 @@ export class CallService {
       };
       try {
         const id = uuidv4();
-        this.peer = new Peer(environment.peerUrl);
+        this.peer = new Peer(id, {
+          host: environment.peerHost,
+          port: !environment.production ? environment.port : 443,
+          path: '/',
+        });
 
         console.log('peerId: ', this.peer.id);
         return id;
