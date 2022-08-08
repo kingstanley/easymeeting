@@ -87,10 +87,10 @@ export class LiveComponent implements OnInit {
             this.addVideoStream(peerVideo, peerStream);
           });
         });
-        this.socket.on(
+        this.chatService.Socket.on(
           'user-connected',
           (peerId: string | any, usertype: string) => {
-            console.log('new user type: ', usertype);
+            console.log('new user type: ', peerId);
             this.connectToNewUser(peerId, stream, usertype);
           }
         );
@@ -126,6 +126,8 @@ export class LiveComponent implements OnInit {
   }
   connectToNewUser(peerId: any, stream: any, usertype: string) {
     const alreadyExist = this.peers[peerId];
+    console.log('connecting to peers', peerId, this.peers);
+
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
       const call = this.callService.getPeer()?.call(peerId, stream);
