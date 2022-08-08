@@ -34,7 +34,7 @@ export class CallService {
         const id = uuidv4();
         this.peer = new Peer(id, {
           host: environment.peerHost,
-          port: !environment.production ? environment.port : 443,
+          port: environment.port,
           path: '/',
         });
 

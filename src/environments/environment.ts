@@ -7,7 +7,7 @@ export const environment = {
   apiUrl: 'https://meeteasy.herokuapp.com/api/',
   socketUrl: 'http://localhost:9000',
   peerHost: 'easymeet-peer-server.herokuapp.com',
-  port: 443,
+  port: 9000,
 };
 
 /*
