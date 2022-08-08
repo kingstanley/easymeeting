@@ -25,6 +25,15 @@ export class LiveComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.chatService
+      .helloMessage()
+      .subscribe((response) => console.log('hello response: ', response));
+    this.chatService
+      .welcomeMessage()
+      .subscribe((message) => console.log('message: ', message));
+    console.log('io socket: ', this.chatService.Socket.ioSocket);
+    this.chatService.sendMessage('hello', 'Hello server');
+
     this.activatedRoute.params.subscribe((param) => {
       console.log('rood id: ', param['id']);
       this.ROOM_ID = param['id'];
