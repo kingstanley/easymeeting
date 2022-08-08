@@ -33,8 +33,7 @@ export class CallService {
       try {
         const id = uuidv4();
         this.peer = new Peer(id, {
-          host: 'localhost',
-          port: 9000,
+          host: environment.peerUrl,
           path: '/',
         });
 

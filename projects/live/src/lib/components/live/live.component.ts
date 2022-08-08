@@ -126,11 +126,13 @@ export class LiveComponent implements OnInit {
   }
   connectToNewUser(peerId: any, stream: any, usertype: string) {
     const alreadyExist = this.peers[peerId];
-    console.log('connecting to peers', peerId, this.peers);
+    console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
       const call = this.callService.getPeer()?.call(peerId, stream);
+      console.log('call: ', call);
+
       call?.on('stream', (userVideoStream: any) => {
         const userVideoExist = document.getElementById(peerId);
         if (!userVideoExist) {
