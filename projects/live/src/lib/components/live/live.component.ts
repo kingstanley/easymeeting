@@ -78,7 +78,7 @@ export class LiveComponent implements OnInit {
           console.log('no peer connected');
         }
         this.addVideoStream(myVideo, stream);
-        // this.addVideoStream(myVideo, stream);
+
         this.callService.getPeer()?.on('call', (call: any) => {
           call.answer(stream);
           const peerVideo = document.createElement('video');
@@ -112,17 +112,19 @@ export class LiveComponent implements OnInit {
 
   addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
     const videoGrid: HTMLDivElement = document.querySelector(
-      '.main'
+      '.video-grid'
     ) as HTMLDivElement;
     video.srcObject = stream;
     //   console.log("My stream: ", stream);
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
-
-    video.className = 'video2';
-
-    videoGrid.append(video);
+    const holder = document.createElement('div');
+    holder.className = 'card bg-dark';
+    holder.style.width = '100%';
+    holder.style.height = '100%';
+    holder.append(video);
+    videoGrid.append(holder);
   }
   connectToNewUser(peerId: any, stream: any, usertype: string) {
     const alreadyExist = this.peers[peerId];
