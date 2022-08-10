@@ -120,9 +120,9 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = 'card bg-dark';
+    holder.className = 'holder';
     holder.style.width = '100%';
-    holder.style.height = '100%';
+    holder.style.height = 'auto';
     holder.append(video);
     videoGrid.append(holder);
   }
