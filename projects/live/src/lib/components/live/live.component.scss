@@ -12,7 +12,7 @@
 .video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+  // grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
   align-items: center;
   gap: 2px;
   // grid-auto-rows: 600px;
