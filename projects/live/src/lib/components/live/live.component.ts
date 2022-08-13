@@ -14,6 +14,7 @@ export class LiveComponent implements OnInit {
   peers = Object.assign({});
   streams: Array<any> = [];
   ROOM_ID = '';
+  users: Array<{ stream: any }> = [];
   constructor(
     private router: Router,
     private callService: CallService,
@@ -109,10 +110,40 @@ export class LiveComponent implements OnInit {
       this.socket.emit('join-room', this.ROOM_ID, peerId);
     });
   }
+  resizeGrid() {
+    const container = document.querySelector('.video-grid') as HTMLDivElement;
+    console.log('resing : ', container);
 
+    if (this.users.length < 5) {
+      container.style.gridTemplateColumns = '1fr 1fr';
+      container.style.gridAutoRows = '350px ';
+    }
+    if (this.users.length == 1) {
+      container.style.gridTemplateColumns = '1fr';
+      container.style.gridAutoRows = '600px ';
+    }
+    if (this.users.length < 10 && this.users.length >= 5) {
+      container.style.gridTemplateColumns = '1fr 1fr 1fr';
+      container.style.gridAutoRows = '350px ';
+    }
+    if (this.users.length < 15 && this.users.length >= 10) {
+      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
+      container.style.gridAutoRows = '200px ';
+    }
+    if (this.users.length < 20 && this.users.length >= 15) {
+      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr';
+      container.style.gridAutoRows = '200px ';
+    }
+    if (this.users.length >= 20) {
+      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr 1fr';
+      container.style.gridAutoRows = '200px ';
+    }
+  }
   addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
+    this.users.push({ stream: stream });
+    this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
-      '.content'
+      '.video-grid'
     ) as HTMLDivElement;
     video.srcObject = stream;
     video.autoplay;
@@ -121,7 +152,7 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = 'item';
+    holder.className = '';
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
     holder.append(video);

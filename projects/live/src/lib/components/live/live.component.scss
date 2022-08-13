@@ -13,27 +13,28 @@
 
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
-  align-items: center;
-  gap: 2px;
-  // grid-auto-flow: dense;
-  justify-items: center;
-  overflow: hidden;
-  place-self: center;
-  align-content: stretch;
-  justify-content: stretch;
+  gap: 5px;
+  // display: grid;
+  // grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  // grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+  // align-items: center;
+  // gap: 2px;
+  // justify-items: center;
+  // overflow: hidden;
+  // place-self: center;
+  // align-content: stretch;
+  // justify-content: stretch;
 }
 
-.video-grid>div:nth-child(4n) {
-  grid-column: span 2;
-  grid-row: span 2;
-}
+// .video-grid>div:nth-child(4n) {
+//   grid-column: span 2;
+//   grid-row: span 2;
+// }
 
-.video-grid>mat-card:nth-child(4n) {
-  grid-column: span 2;
-  grid-row: span 2;
-}
+// .video-grid>mat-card:nth-child(4n) {
+//   grid-column: span 2;
+//   grid-row: span 2;
+// }
 
 .side-nav {
   background-color: black;
@@ -42,11 +43,11 @@
   display: none;
 }
 
-video {
-  width: 100%;
-  height: auto;
-  place-self: center;
-}
+// video {
+//   width: 100%;
+//   height: auto;
+//   place-self: center;
+// }
 
 .holder {
   width: 100%;
