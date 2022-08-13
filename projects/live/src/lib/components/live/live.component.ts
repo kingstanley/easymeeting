@@ -43,8 +43,8 @@ export class LiveComponent implements OnInit {
       .getUserMedia({
         audio: true,
         video: {
-          width: { min: 250, ideal: 800, max: 1920 },
-          height: { min: 100, ideal: 450, max: 1080 },
+          width: { min: 250, max: 1920 },
+          height: { min: 100, max: 1080 },
           facingMode: 'user',
         },
       })
@@ -125,7 +125,7 @@ export class LiveComponent implements OnInit {
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
     holder.append(video);
-    videoGrid.append(holder);
+    videoGrid.prepend(holder);
   }
   connectToNewUser(peerId: any, stream: any, usertype: string) {
     const alreadyExist = this.peers[peerId];
