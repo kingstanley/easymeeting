@@ -43,7 +43,7 @@ export class LiveComponent implements OnInit {
       .getUserMedia({
         audio: true,
         video: {
-          width: { min: 250, ideal: 600, max: 1920 },
+          width: { min: 250, ideal: 800, max: 1920 },
           height: { min: 100, ideal: 450, max: 1080 },
           facingMode: 'user',
         },
@@ -112,15 +112,16 @@ export class LiveComponent implements OnInit {
 
   addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
     const videoGrid: HTMLDivElement = document.querySelector(
-      '.video-grid'
+      '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
+    video.autoplay;
     //   console.log("My stream: ", stream);
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
     const holder = document.createElement('div');
-    // holder.className = 'holder';
+    holder.className = 'item';
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
     holder.append(video);
