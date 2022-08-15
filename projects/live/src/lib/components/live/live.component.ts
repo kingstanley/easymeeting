@@ -169,9 +169,9 @@ export class LiveComponent implements OnInit {
     holder.className =
       this.users.length <= 2
         ? 'item'
-        : this.users.length <= 5
+        : this.users.length <= 5 && this.users.length > 2
         ? 'item1'
-        : this.users.length <= 10
+        : this.users.length <= 10 && this.users.length > 5
         ? 'item2'
         : 'item3';
     // holder.style.width = '100%';
