@@ -166,9 +166,17 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = 'item';
+    holder.className =
+      this.users.length <= 2
+        ? 'item'
+        : this.users.length <= 5
+        ? 'item1'
+        : this.users.length <= 10
+        ? 'item2'
+        : 'item3';
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
+
     holder.append(video);
     videoGrid.prepend(holder);
   }

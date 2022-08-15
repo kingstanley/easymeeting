@@ -17,6 +17,27 @@
      flex: 1;
    }
 
+   .item1 {
+     min-width: 100px;
+     max-width: 300px;
+     max-height: 200px;
+     flex: 1;
+   }
+
+   .item2 {
+     min-width: 100px;
+     max-width: 250px;
+     max-height: 200px;
+     flex: 1;
+   }
+
+   .item3 {
+     min-width: 100px;
+     max-width: 200px;
+     max-height: 150px;
+     flex: 1;
+   }
+
    main {
      //  justify-content: center;
      //  align-items: center;
