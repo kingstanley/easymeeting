@@ -7,8 +7,8 @@ import { ChatService } from 'src/app/shared/chat.service';
 
 @Component({
   selector: 'meet-live',
-  templateUrl: './live.component.html',
-  styleUrls: ['./live.component.scss'],
+  templateUrl: './live.component1.html',
+  styleUrls: ['./live.component1.scss'],
 })
 export class LiveComponent implements OnInit {
   peers = Object.assign({});
@@ -39,17 +39,29 @@ export class LiveComponent implements OnInit {
       console.log('rood id: ', param['id']);
       this.ROOM_ID = param['id'];
     });
+    console.log(
+      'supported constraints: ',
+      navigator.mediaDevices.getSupportedConstraints()
+    );
+
     this.callService.initPeer();
     navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: {
-          width: { min: 250, max: 1920 },
-          height: { min: 100, max: 1080 },
+          // width: { min: 250, max: 1920 },
+          // height: { min: 100, max: 1080 },
           facingMode: 'user',
         },
       })
       .then(async (stream) => {
+        console.log(
+          'capabilities',
+          stream.getVideoTracks()[0].getCapabilities(),
+          'constraints',
+          stream.getVideoTracks()[0].getConstraints()
+        );
+
         const myVideo = document.createElement('video');
         myVideo.muted = true;
         // handle comments
@@ -111,7 +123,7 @@ export class LiveComponent implements OnInit {
     });
   }
   resizeGrid() {
-    const container = document.querySelector('.video-grid') as HTMLDivElement;
+    const container = document.querySelector('.content') as HTMLDivElement;
     console.log('resing : ', container);
 
     if (this.users.length < 5) {
@@ -141,9 +153,11 @@ export class LiveComponent implements OnInit {
   }
   addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
     this.users.push({ stream: stream });
-    this.resizeGrid();
+    console.log('my stream: ', stream);
+
+    // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
-      '.video-grid'
+      '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
     video.autoplay;
@@ -152,7 +166,7 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = '';
+    holder.className = 'item';
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
     holder.append(video);
