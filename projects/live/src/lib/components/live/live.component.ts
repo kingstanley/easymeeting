@@ -49,8 +49,8 @@ export class LiveComponent implements OnInit {
       .getUserMedia({
         audio: true,
         video: {
-          // width: { min: 250, max: 1920 },
-          // height: { min: 100, max: 1080 },
+          width: { min: 250, ideal: 600, max: 1920 },
+          height: { min: 100, ideal: 400, max: 1080 },
           facingMode: 'user',
         },
       })
