@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
+import { MeetingService } from '../../services/meeting.service';
 import { AdmitComponent } from '../admit/admit.component';
 
 @Component({
@@ -26,6 +27,7 @@ export class LiveComponent implements OnInit {
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream | any = new MediaStream();
   isPeerOpend = false;
+  meeting: any;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -33,7 +35,8 @@ export class LiveComponent implements OnInit {
     private socket: Socket,
     private activatedRoute: ActivatedRoute,
     private msb: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private meetingService: MeetingService
   ) {}
 
   async ngOnInit() {
@@ -49,11 +52,17 @@ export class LiveComponent implements OnInit {
     this.activatedRoute.params.subscribe((param) => {
       console.log('rood id: ', param['id']);
       this.ROOM_ID = param['id'];
+      this.meetingService
+        .getMeetingByCode(this.ROOM_ID)
+        .subscribe((meeting) => {
+          this.meeting = meeting;
+          console.log('meeting: ', meeting);
+        });
     });
-    console.log(
-      'supported constraints: ',
-      navigator.mediaDevices.getSupportedConstraints()
-    );
+    // console.log(
+    //   'supported constraints: ',
+    //   navigator.mediaDevices.getSupportedConstraints()
+    // );
 
     this.callService.initPeer();
     // (async () => {
@@ -91,12 +100,22 @@ export class LiveComponent implements OnInit {
     );
     this.socket.on(
       'ask-to-join',
-      (roomId: string, username: string, peerId: string) => {
-        console.log('ask to join data: ', roomId, username, peerId);
+      (roomId: string, username: string, socketId: string) => {
+        console.log('ask to join data: ', roomId, username, socketId);
 
-        this.dialog.open(AdmitComponent, {
-          data: { roomId, username, peerId },
-        });
+        this.dialog
+          .open(AdmitComponent, {
+            data: { roomId, username, socketId },
+          })
+          .afterClosed()
+          .subscribe((result) => {
+            if (result) {
+              // admit
+              this.socket.emit('admit-or-reject', socketId, result);
+            } else {
+              // reject
+            }
+          });
       }
     );
     this.socket.on('user-disconnected', (peerId: string) => {
@@ -107,13 +126,21 @@ export class LiveComponent implements OnInit {
     });
 
     // this.isPeerOpend = true;
-    this.socket.fromEvent('admitted').subscribe((roomId) => {
-      this.callService.getPeer()?.on('open', (peerId: string) => {
-        console.log('My PeerId: ', peerId);
-        this.addVideoStream(myVideo, this.myStream);
-        this.socket.emit('join-room', roomId, peerId);
+    this.socket
+      .fromEvent<string>('admit-or-reject')
+      .subscribe((result: string) => {
+        this.callService.getPeer()?.on('open', (peerId: string) => {
+          console.log('My PeerId: ', peerId);
+          if (result) {
+            this.addVideoStream(myVideo, this.myStream);
+            this.socket.emit('join-room', this.ROOM_ID, peerId);
+          } else {
+            this.msb.open('You were not admitted into the meeting', 'X', {
+              duration: 4000,
+            });
+          }
+        });
       });
-    });
   }
   askToJoin() {
     console.log('asking to join with', this.callService.getPeer()?.id);
@@ -123,7 +150,7 @@ export class LiveComponent implements OnInit {
         'ask-to-join',
         this.ROOM_ID,
         this.username,
-        this.callService.getPeer()?.id
+        this.socket.ioSocket.id
       );
     } else {
       this.msb.open('Please enter name or organization', 'X', {

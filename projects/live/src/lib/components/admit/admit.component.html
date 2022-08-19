@@ -1,5 +1,8 @@
 <h3>Hi!</h3>
-{{data.username}} wants to join meeting.
+<span class="p-2">
+  {{data.username}} wants to join meeting.
+</span>
 <div class="action">
-  <button mat-button (click)="admit()">Admit</button><button mat-button (click)="reject()">Reject</button>
+  <button mat-button color="primary" (click)="admit()">Admit</button>
+  <button mat-button color="warn" (click)="reject()">Reject</button>
 </div>

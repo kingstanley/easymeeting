@@ -22,4 +22,7 @@ export class MeetingService {
       date: new Date(),
     });
   }
+  getMeetingByCode(ROOM_ID: string) {
+    return this.http.get(apiUrl + route + 'meeting-code/' + ROOM_ID);
+  }
 }
