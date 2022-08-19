@@ -15,7 +15,12 @@ export class ChatService {
   helloMessage() {
     return this.Socket.fromEvent('hello');
   }
-  asKToJoin(roomId: string, username: string, socketId: string) {
-    return this.Socket.emit('ask-to-join', roomId, username, socketId);
+  asKToJoin(
+    roomId: string,
+    username: string,
+    socketId: string,
+    email?: string
+  ) {
+    return this.Socket.emit('ask-to-join', roomId, username, socketId, email);
   }
 }

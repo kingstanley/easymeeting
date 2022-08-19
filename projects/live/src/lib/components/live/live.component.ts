@@ -111,22 +111,24 @@ export class LiveComponent implements OnInit {
     );
     this.socket.on(
       'ask-to-join',
-      (roomId: string, username: string, socketId: string) => {
+      (roomId: string, username: string, socketId: string, email: string) => {
         console.log('ask to join data: ', roomId, username, socketId);
 
-        this.dialog
-          .open(AdmitComponent, {
-            data: { roomId, username, socketId },
-          })
-          .afterClosed()
-          .subscribe((result) => {
-            if (result) {
-              // admit
-              this.socket.emit('admit-or-reject', socketId, result);
-            } else {
-              // reject
-            }
-          });
+        if (!email) {
+          this.dialog
+            .open(AdmitComponent, {
+              data: { roomId, username, socketId },
+            })
+            .afterClosed()
+            .subscribe((result) => {
+              if (result) {
+                // admit
+                this.socket.emit('admit-or-reject', socketId, result);
+              } else {
+                // reject
+              }
+            });
+        }
       }
     );
     this.socket.on('user-disconnected', (peerId: string) => {
@@ -161,7 +163,8 @@ export class LiveComponent implements OnInit {
       this.chatService.asKToJoin(
         this.ROOM_ID,
         this.username,
-        this.socket.ioSocket.id
+        this.socket.ioSocket.id,
+        this.user?.email
       );
     } else {
       this.msb.open('Please enter name or organization', 'X', {
