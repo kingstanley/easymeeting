@@ -64,7 +64,7 @@ export class LiveComponent implements OnInit {
         .subscribe((meeting) => {
           this.meeting = meeting;
           console.log('meeting: ', meeting);
-          if (this.user.email == this.meeting.host) {
+          if (this.user?.email == this.meeting.host) {
             this.isAdmitted = true;
           }
         });
