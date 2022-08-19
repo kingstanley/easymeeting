@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
+import { AuthService } from 'projects/account/src/lib/components/services/auth.service';
+import { UserService } from 'projects/account/src/lib/components/services/user.service';
 import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
@@ -28,6 +30,7 @@ export class LiveComponent implements OnInit {
   myStream: MediaStream | any = new MediaStream();
   isPeerOpend = false;
   meeting: any;
+  user: any;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -36,10 +39,16 @@ export class LiveComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private msb: MatSnackBar,
     private dialog: MatDialog,
-    private meetingService: MeetingService
+    private meetingService: MeetingService,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
+    this.user = this.authService.getUser();
+    if (this.user) {
+      // this.username = this.user.name;
+    }
+    this.isAdmitted = true;
     this.chatService
       .helloMessage()
       .subscribe((response) => console.log('hello response: ', response));
@@ -80,7 +89,7 @@ export class LiveComponent implements OnInit {
       // myVideo.style.width = 'auto';
       // myVideo.style.height = 'auto';
       console.log('my stream is ', this.myStream);
-      this.addPreview(myVideo, this.myStream);
+      this.addVideoStream(myVideo, this.myStream);
 
       this.callService.getPeer()?.on('call', (call: any) => {
         call.answer(this.myStream);
@@ -126,21 +135,21 @@ export class LiveComponent implements OnInit {
     });
 
     // this.isPeerOpend = true;
-    this.socket
-      .fromEvent<string>('admit-or-reject')
-      .subscribe((result: string) => {
-        this.callService.getPeer()?.on('open', (peerId: string) => {
-          console.log('My PeerId: ', peerId);
-          if (result) {
-            this.addVideoStream(myVideo, this.myStream);
-            this.socket.emit('join-room', this.ROOM_ID, peerId);
-          } else {
-            this.msb.open('You were not admitted into the meeting', 'X', {
-              duration: 4000,
-            });
-          }
-        });
+    this.socket.on('admit-or-reject', (result: string) => {
+      this.callService.getPeer()?.on('open', (peerId: string) => {
+        console.log('My PeerId: ', peerId);
+        if (result) {
+          this.addVideoStream(myVideo, this.myStream);
+          this.socket.emit('join-room', this.ROOM_ID, peerId);
+          this.isAdmitted = true;
+          console.log('isAdmitted: ', this.isAdmitted, result);
+        } else {
+          this.msb.open('You were not admitted into the meeting', 'X', {
+            duration: 4000,
+          });
+        }
       });
+    });
   }
   askToJoin() {
     console.log('asking to join with', this.callService.getPeer()?.id);
