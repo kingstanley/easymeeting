@@ -45,10 +45,8 @@ export class LiveComponent implements OnInit {
 
   async ngOnInit() {
     this.user = this.authService.getUser();
-    if (this.user) {
-      // this.username = this.user.name;
-    }
-    this.isAdmitted = true;
+    console.log('loggedIn user: ', this.user);
+
     this.chatService
       .helloMessage()
       .subscribe((response) => console.log('hello response: ', response));
@@ -66,6 +64,9 @@ export class LiveComponent implements OnInit {
         .subscribe((meeting) => {
           this.meeting = meeting;
           console.log('meeting: ', meeting);
+          if (this.user.email == this.meeting.host) {
+            this.isAdmitted = true;
+          }
         });
     });
     // console.log(
@@ -139,6 +140,8 @@ export class LiveComponent implements OnInit {
       this.callService.getPeer()?.on('open', (peerId: string) => {
         console.log('My PeerId: ', peerId);
         if (result) {
+          console.log('isadmitted: ', result);
+
           this.addVideoStream(myVideo, this.myStream);
           this.socket.emit('join-room', this.ROOM_ID, peerId);
           this.isAdmitted = true;
