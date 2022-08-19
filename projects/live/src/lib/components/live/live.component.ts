@@ -137,21 +137,25 @@ export class LiveComponent implements OnInit {
     // this.isPeerOpend = true;
     this.socket.on('admitted', (result: boolean) => {
       console.log('admit or reject: ', result);
-      this.callService.getPeer()?.on('open', (peerId: string) => {
-        console.log('My PeerId: ', peerId);
-        if (result) {
-          console.log('isadmitted: ', result);
+      // this.callService.getPeer()?.on('open', (peerId: string) => {
+      console.log('My PeerId: ', this.callService.getPeer()?.id);
+      if (result) {
+        console.log('isadmitted: ', result);
 
-          this.addVideoStream(myVideo, this.myStream);
-          this.socket.emit('join-room', this.ROOM_ID, peerId);
-          this.isAdmitted = true;
-          console.log('isAdmitted: ', this.isAdmitted, result);
-        } else {
-          this.msb.open('You were not admitted into the meeting', 'X', {
-            duration: 4000,
-          });
-        }
-      });
+        this.addVideoStream(myVideo, this.myStream);
+        this.socket.emit(
+          'join-room',
+          this.ROOM_ID,
+          this.callService.getPeer()?.id
+        );
+        this.isAdmitted = true;
+        console.log('isAdmitted: ', this.isAdmitted, result);
+      } else {
+        this.msb.open('You were not admitted into the meeting', 'X', {
+          duration: 4000,
+        });
+      }
+      // });
     });
   }
   askToJoin() {
