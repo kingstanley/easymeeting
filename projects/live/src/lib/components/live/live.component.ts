@@ -121,12 +121,8 @@ export class LiveComponent implements OnInit {
             })
             .afterClosed()
             .subscribe((result) => {
-              if (result) {
-                // admit
-                this.socket.emit('admit-or-reject', socketId, result);
-              } else {
-                // reject
-              }
+              // admit
+              this.socket.emit('admit-or-reject', socketId, result);
             });
         }
       }
@@ -139,7 +135,8 @@ export class LiveComponent implements OnInit {
     });
 
     // this.isPeerOpend = true;
-    this.socket.on('admit-or-reject', (result: string) => {
+    this.socket.on('admitted', (result: boolean) => {
+      console.log('admit or reject: ', result);
       this.callService.getPeer()?.on('open', (peerId: string) => {
         console.log('My PeerId: ', peerId);
         if (result) {
