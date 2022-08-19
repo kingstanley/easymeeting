@@ -7,6 +7,7 @@ import { ChatService } from 'src/app/shared/chat.service';
 
 @Component({
   selector: 'meet-live',
+
   templateUrl: './live.component1.html',
   styleUrls: ['./live.component1.scss'],
 })
@@ -14,18 +15,20 @@ export class LiveComponent implements OnInit {
   peers = Object.assign({});
   streams: Array<any> = [];
   ROOM_ID = '';
+  averageRating = 0;
   users: Array<{ stream: any }> = [];
+  constrainWidth = { min: 250, ideal: 600, max: 1920 };
+  constrainHeight = { min: 100, ideal: 400, max: 1080 };
+  myStream: MediaStream | any = new MediaStream();
   constructor(
     private router: Router,
     private callService: CallService,
     private chatService: ChatService,
     private socket: Socket,
     private activatedRoute: ActivatedRoute
-  ) {
-    this.callService.initPeer();
-  }
+  ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.chatService
       .helloMessage()
       .subscribe((response) => console.log('hello response: ', response));
@@ -45,81 +48,69 @@ export class LiveComponent implements OnInit {
     );
 
     this.callService.initPeer();
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-        video: {
-          width: { min: 250, ideal: 600, max: 1920 },
-          height: { min: 100, ideal: 400, max: 1080 },
-          facingMode: 'user',
-        },
-      })
-      .then(async (stream) => {
-        console.log(
-          'capabilities',
-          stream.getVideoTracks()[0].getCapabilities(),
-          'constraints',
-          stream.getVideoTracks()[0].getConstraints()
-        );
+    // (async () => {
+    await this.getMediaStream();
+    // })();
 
-        const myVideo = document.createElement('video');
-        myVideo.muted = true;
-        // handle comments
-        // socket.on('get-comments', async (comList) => {
-        //   comments = comments;
-        //   console.log('Gotten comments: ', comList);
-        //   const div = document.getElementById('commentList');
-        //   for (const comment of comList) {
-        //     await createCommentLi(comment, div);
-        //   }
-        // });
-        // socket.emit('request-comments', ROOM_ID);
-        // socket.on('new-comment', async (comment) => {
-        //   const div = document.getElementById('commentList');
-        //   await createCommentLi(comment, div);
-        // });
-        // socket.emit('request-user', UIN);
-        // socket.on('get-user', (user) => {
-        //   console.log('User: ', user);
-        //   USER = user;
-        // });
-        console.log('peers: ', this.peers);
+    if (this.myStream) this.callService.initPeer();
 
-        if (this.peers) {
-          // myVideo.style.width = 'auto';
-          // myVideo.style.height = 'auto';
-          console.log('no peer connected');
+    const myVideo = document.createElement('video');
+    myVideo.muted = true;
+
+    console.log('peers: ', this.peers);
+
+    if (this.myStream) {
+      // myVideo.style.width = 'auto';
+      // myVideo.style.height = 'auto';
+      console.log('no peer connected');
+
+      this.addVideoStream(myVideo, this.myStream);
+
+      this.callService.getPeer()?.on('call', (call: any) => {
+        call.answer(this.myStream);
+        const peerVideo = document.createElement('video');
+
+        call.on('stream', (peerStream: any) => {
+          this.addVideoStream(peerVideo, peerStream);
+        });
+      });
+      this.chatService.Socket.on(
+        'user-connected',
+        (peerId: string | any, usertype: string) => {
+          console.log('new user type: ', peerId);
+          this.connectToNewUser(peerId, this.myStream, usertype);
         }
-        this.addVideoStream(myVideo, stream);
+      );
 
-        this.callService.getPeer()?.on('call', (call: any) => {
-          call.answer(stream);
-          const peerVideo = document.createElement('video');
-
-          call.on('stream', (peerStream: any) => {
-            this.addVideoStream(peerVideo, peerStream);
-          });
-        });
-        this.chatService.Socket.on(
-          'user-connected',
-          (peerId: string | any, usertype: string) => {
-            console.log('new user type: ', peerId);
-            this.connectToNewUser(peerId, stream, usertype);
-          }
-        );
-
-        this.socket.on('user-disconnected', (peerId: string) => {
-          console.log('disconnected userId: ', peerId);
-          if (this.peers[peerId]) {
-            this.peers[peerId].close();
-          }
-        });
-      })
-      .catch((err) => console.log('Media Error: ', err));
+      this.socket.on('user-disconnected', (peerId: string) => {
+        console.log('disconnected userId: ', peerId);
+        if (this.peers[peerId]) {
+          this.peers[peerId].close();
+        }
+      });
+    }
     this.callService.getPeer()?.on('open', (peerId: string) => {
       console.log('My PeerId: ', peerId);
 
       this.socket.emit('join-room', this.ROOM_ID, peerId);
+    });
+  }
+  async getMediaStream() {
+    this.myStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: {
+        width: {
+          min: this.constrainWidth.min,
+          ideal: this.constrainWidth.ideal,
+          max: this.constrainWidth.max,
+        },
+        // height: {
+        //   min: this.constrainHeight.min,
+        //   ideal: this.constrainHeight.ideal,
+        //   max: this.constrainHeight.max,
+        // },
+        facingMode: 'user',
+      },
     });
   }
   resizeGrid() {
@@ -166,14 +157,23 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className =
-      this.users.length <= 2
-        ? 'item'
-        : this.users.length <= 5 && this.users.length > 2
-        ? 'item1'
-        : this.users.length <= 10 && this.users.length > 5
-        ? 'item2'
-        : 'item3';
+    if (this.users.length <= 2) {
+      this.constrainWidth.ideal = 1000;
+      holder.className = 'item';
+      (async () => {
+        await this.getMediaStream();
+        console.log('new stream: ', this.myStream);
+      })();
+    }
+    if (this.users.length <= 5 && this.users.length > 2) {
+      holder.className = 'item1';
+    }
+    if (this.users.length <= 10 && this.users.length > 5) {
+      holder.className = 'item2';
+    }
+    if (this.users.length > 10) {
+      holder.className = 'item3';
+    }
     // holder.style.width = '100%';
     // holder.style.height = 'auto';
 

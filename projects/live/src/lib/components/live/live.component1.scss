@@ -4,16 +4,16 @@
      overflow-y: hidden;
      gap: 5px;
      flex-wrap: wrap;
-     //  align-content: center;
+     height: 100vh;
      justify-content: center;
      align-items: center;
      //  justify-items: center;
    }
 
    .item {
-     width: 400px;
+     width: 4000px;
      height: auto;
-     flex: 1;
+     //  flex: 1;
    }
 
    .item1 {
@@ -49,6 +49,6 @@
 
    video {
      width: 100%;
-     height: auto;
+     height: 100%;
      place-self: center;
    }

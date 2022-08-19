@@ -1,0 +1,42 @@
+// template: `{{ ROOM_ID }}
+  //   <div
+  //     *ngFor="let star of [].constructor(5); let i = index"
+  //     style="display:inline-block"
+  //   >
+  //     <span *ngIf="i < rate"> &#9733; </span>
+  //     <span *ngIf="i >= rate">&#9734;</span>
+  //   </div>
+
+  //   <h2>Average</h2>
+  //   <div
+  //     *ngFor="let star of [].constructor(5); let i = index"
+  //     style="display:inline-block"
+  //   >
+  //     <span *ngIf="i < averageRating"> &#9733; </span>
+  //     <span *ngIf="i >= averageRating">&#9734;</span>
+  //   </div> `
+
+rate = 4;
+  ratings = [
+    {
+      name: 'John Doe',
+      content: 'Nice thing!',
+      rate: 5,
+    },
+    {
+      name: 'John Doe',
+      content: 'Nice thing!',
+      rate: 4,
+    },
+    {
+      name: 'John Doe',
+      content: 'Nice thing!',
+      rate: 3,
+    },
+  ];
+constructor(){
+  this.callService.initPeer();
+    const total = this.ratings.reduce((val, newVal) => val + newVal.rate, 0);
+    this.averageRating = total / this.ratings.length;
+    console.log('av: ', total, 'averageRating: ', this.averageRating);
+    }
