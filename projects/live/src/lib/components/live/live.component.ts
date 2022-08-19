@@ -66,6 +66,7 @@ export class LiveComponent implements OnInit {
           console.log('meeting: ', meeting);
           if (this.user?.email == this.meeting.host) {
             this.isAdmitted = true;
+            this.askToJoin();
           }
         });
     });
@@ -155,11 +156,9 @@ export class LiveComponent implements OnInit {
     });
   }
   askToJoin() {
-    console.log('asking to join with', this.callService.getPeer()?.id);
-
     if (this.callService.getPeer()?.id && this.username) {
-      this.socket.emit(
-        'ask-to-join',
+      console.log('asking to join with', this.callService.getPeer()?.id);
+      this.chatService.asKToJoin(
         this.ROOM_ID,
         this.username,
         this.socket.ioSocket.id
