@@ -1,5 +1,18 @@
 <main>
-  <div class="content">
+  <div class="ask-screen " *ngIf="!isAdmitted">
+    <div class="preview ">
+    </div>
+    <div class="action ">
+      <mat-form-field>
+        <input matInput [(ngModel)]="username" placeholder="Name or organization">
+      </mat-form-field>
+      <div class="buttons">
+        <button mat-raised-button (click)="askToJoin()" color="primary">Ask to Join</button>
+        <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
+      </div>
+    </div>
+  </div>
+  <div class="content" *ngIf="isAdmitted">
     <!-- <div class="item card bg-darg">
       <video src="assets/Feed.mp4"></video>
     </div>

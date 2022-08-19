@@ -1,9 +1,12 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
+import { AdmitComponent } from '../admit/admit.component';
 
 @Component({
   selector: 'meet-live',
@@ -16,16 +19,21 @@ export class LiveComponent implements OnInit {
   streams: Array<any> = [];
   ROOM_ID = '';
   averageRating = 0;
+  isAdmitted = false;
+  username = '';
   users: Array<{ stream: any }> = [];
-  constrainWidth = { min: 250, ideal: 600, max: 1920 };
+  constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream | any = new MediaStream();
+  isPeerOpend = false;
   constructor(
     private router: Router,
     private callService: CallService,
     private chatService: ChatService,
     private socket: Socket,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private msb: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   async ngOnInit() {
@@ -63,8 +71,7 @@ export class LiveComponent implements OnInit {
       // myVideo.style.width = 'auto';
       // myVideo.style.height = 'auto';
       console.log('my stream is ', this.myStream);
-
-      this.addVideoStream(myVideo, this.myStream);
+      this.addPreview(myVideo, this.myStream);
 
       this.callService.getPeer()?.on('call', (call: any) => {
         call.answer(this.myStream);
@@ -82,18 +89,50 @@ export class LiveComponent implements OnInit {
         this.connectToNewUser(peerId, this.myStream, usertype);
       }
     );
+    this.socket.on(
+      'ask-to-join',
+      (roomId: string, username: string, peerId: string) => {
+        console.log('ask to join data: ', roomId, username, peerId);
 
+        this.dialog.open(AdmitComponent, {
+          data: { roomId, username, peerId },
+        });
+      }
+    );
     this.socket.on('user-disconnected', (peerId: string) => {
       console.log('disconnected userId: ', peerId);
       if (this.peers[peerId]) {
         this.peers[peerId].close();
       }
     });
-    this.callService.getPeer()?.on('open', (peerId: string) => {
-      console.log('My PeerId: ', peerId);
 
-      this.socket.emit('join-room', this.ROOM_ID, peerId);
+    // this.isPeerOpend = true;
+    this.socket.fromEvent('admitted').subscribe((roomId) => {
+      this.callService.getPeer()?.on('open', (peerId: string) => {
+        console.log('My PeerId: ', peerId);
+        this.addVideoStream(myVideo, this.myStream);
+        this.socket.emit('join-room', roomId, peerId);
+      });
     });
+  }
+  askToJoin() {
+    console.log('asking to join with', this.callService.getPeer()?.id);
+
+    if (this.callService.getPeer()?.id && this.username) {
+      this.socket.emit(
+        'ask-to-join',
+        this.ROOM_ID,
+        this.username,
+        this.callService.getPeer()?.id
+      );
+    } else {
+      this.msb.open('Please enter name or organization', 'X', {
+        duration: 3000,
+      });
+    }
+  }
+  cancelJoin() {
+    console.log('cancel join');
   }
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
@@ -141,6 +180,18 @@ export class LiveComponent implements OnInit {
       container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr 1fr';
       container.style.gridAutoRows = '200px ';
     }
+  }
+  addPreview(video: HTMLVideoElement, stream: any) {
+    const videoGrid: HTMLDivElement = document.querySelector(
+      '.preview'
+    ) as HTMLDivElement;
+    video.srcObject = stream;
+    // video.autoplay;
+    //   console.log("My stream: ", stream);
+    video.addEventListener('loadedmetadata', () => {
+      video.play();
+    });
+    videoGrid.append(video);
   }
   addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
     this.users.push({ stream: stream });
