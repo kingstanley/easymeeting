@@ -62,7 +62,7 @@ export class LiveComponent implements OnInit {
     if (this.myStream) {
       // myVideo.style.width = 'auto';
       // myVideo.style.height = 'auto';
-      console.log('no peer connected');
+      console.log('my stream is ', this.myStream);
 
       this.addVideoStream(myVideo, this.myStream);
 
@@ -74,21 +74,21 @@ export class LiveComponent implements OnInit {
           this.addVideoStream(peerVideo, peerStream);
         });
       });
-      this.chatService.Socket.on(
-        'user-connected',
-        (peerId: string | any, usertype: string) => {
-          console.log('new user type: ', peerId);
-          this.connectToNewUser(peerId, this.myStream, usertype);
-        }
-      );
-
-      this.socket.on('user-disconnected', (peerId: string) => {
-        console.log('disconnected userId: ', peerId);
-        if (this.peers[peerId]) {
-          this.peers[peerId].close();
-        }
-      });
     }
+    this.chatService.Socket.on(
+      'user-connected',
+      (peerId: string | any, usertype: string) => {
+        console.log('new user peerId: ', peerId);
+        this.connectToNewUser(peerId, this.myStream, usertype);
+      }
+    );
+
+    this.socket.on('user-disconnected', (peerId: string) => {
+      console.log('disconnected userId: ', peerId);
+      if (this.peers[peerId]) {
+        this.peers[peerId].close();
+      }
+    });
     this.callService.getPeer()?.on('open', (peerId: string) => {
       console.log('My PeerId: ', peerId);
 
@@ -151,7 +151,7 @@ export class LiveComponent implements OnInit {
       '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
-    video.autoplay;
+    // video.autoplay;
     //   console.log("My stream: ", stream);
     video.addEventListener('loadedmetadata', () => {
       video.play();
