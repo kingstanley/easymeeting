@@ -167,7 +167,7 @@ export class LiveComponent implements OnInit {
     });
   }
   askToJoin() {
-    if ((this.callService.getPeer()?.id && this.username) || this.isAdmitted) {
+    if ((this.callService.getPeer()?.id && this.username) || !this.isAdmitted) {
       console.log('asking to join with', this.callService.getPeer()?.id);
       this.chatService.asKToJoin(
         this.ROOM_ID,
