@@ -66,7 +66,12 @@ export class LiveComponent implements OnInit {
           console.log('meeting: ', meeting);
           if (this.user?.email == this.meeting.host) {
             this.isAdmitted = true;
-            this.askToJoin();
+            this.socket.emit(
+              'join-room',
+              this.ROOM_ID,
+              this.callService.getPeer()?.id,
+              this.username
+            );
           }
         });
     });
@@ -96,19 +101,17 @@ export class LiveComponent implements OnInit {
     console.log('peers: ', this.peers);
 
     if (this.myStream) {
-      // myVideo.style.width = 'auto';
-      // myVideo.style.height = 'auto';
       console.log('my stream is ', this.myStream);
       this.addVideoStream(myVideo, this.myStream);
 
-      this.callService.getPeer()?.on('call', (call: any) => {
-        call.answer(this.myStream);
-        const peerVideo = document.createElement('video');
+      // this.callService.getPeer()?.on('call', (call: any) => {
+      //   call.answer(this.myStream);
+      //   const peerVideo = document.createElement('video');
 
-        call.on('stream', (peerStream: any) => {
-          this.addVideoStream(peerVideo, peerStream);
-        });
-      });
+      //   call.on('stream', (peerStream: any) => {
+      //     this.addVideoStream(peerVideo, peerStream);
+      //   });
+      // });
     }
     this.chatService.Socket.on(
       'user-connected',
