@@ -112,9 +112,9 @@ export class LiveComponent implements OnInit {
     }
     this.chatService.Socket.on(
       'user-connected',
-      (peerId: string | any, usertype: string) => {
+      (peerId: string | any, username: string) => {
         console.log('new user peerId: ', peerId);
-        this.connectToNewUser(peerId, this.myStream, usertype);
+        this.connectToNewUser(peerId, this.myStream, username);
       }
     );
     this.socket.on(
@@ -155,7 +155,8 @@ export class LiveComponent implements OnInit {
         this.socket.emit(
           'join-room',
           this.ROOM_ID,
-          this.callService.getPeer()?.id
+          this.callService.getPeer()?.id,
+          this.username
         );
         // console.log('isAdmitted: ', this.isAdmitted, result);
       } else {
@@ -265,6 +266,12 @@ export class LiveComponent implements OnInit {
         await this.getMediaStream();
         console.log('new stream: ', this.myStream);
       })();
+    } else {
+      this.constrainWidth.ideal = 400;
+      (async () => {
+        await this.getMediaStream();
+        console.log('new stream: ', this.myStream);
+      })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
       holder.className = 'item1';
@@ -275,13 +282,17 @@ export class LiveComponent implements OnInit {
     if (this.users.length > 10) {
       holder.className = 'item3';
     }
-    // holder.style.width = '100%';
-    // holder.style.height = 'auto';
 
     holder.append(video);
+
+    // create container for username and acitons
+    const usernameLabl = document.createElement('span');
+    usernameLabl.innerText = this.username;
+    usernameLabl.className = 'text-white';
+    holder.prepend(usernameLabl);
     videoGrid.prepend(holder);
   }
-  connectToNewUser(peerId: any, myStream: any, usertype: string) {
+  connectToNewUser(peerId: any, myStream: any, username: string) {
     const alreadyExist = this.peers[peerId];
     // console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
@@ -294,7 +305,7 @@ export class LiveComponent implements OnInit {
         const userVideoExist = document.getElementById(peerId);
         if (!userVideoExist) {
           userVideo.id = peerId;
-          this.addVideoStream(userVideo, userVideoStream, usertype);
+          this.addVideoStream(userVideo, userVideoStream, username);
         } else {
           console.log('User video already exist');
         }
