@@ -75,12 +75,20 @@ export class LiveComponent implements OnInit {
     //   navigator.mediaDevices.getSupportedConstraints()
     // );
 
-    this.callService.initPeer();
+    // this.callService.initPeer();
     // (async () => {
     await this.getMediaStream();
     // })();
 
     if (this.myStream) this.callService.initPeer();
+    this.callService.getPeer()?.on('call', (call) => {
+      call.answer(this.myStream);
+      const peerVideo = document.createElement('video');
+
+      call.on('stream', (peerStream) => {
+        this.addVideoStream(peerVideo, peerStream);
+      });
+    });
 
     const myVideo = document.createElement('video');
     myVideo.muted = true;
@@ -142,14 +150,14 @@ export class LiveComponent implements OnInit {
       if (result) {
         console.log('isadmitted: ', result);
 
+        this.isAdmitted = true;
         this.addVideoStream(myVideo, this.myStream);
         this.socket.emit(
           'join-room',
           this.ROOM_ID,
           this.callService.getPeer()?.id
         );
-        this.isAdmitted = true;
-        console.log('isAdmitted: ', this.isAdmitted, result);
+        // console.log('isAdmitted: ', this.isAdmitted, result);
       } else {
         this.msb.open('You were not admitted into the meeting', 'X', {
           duration: 4000,
@@ -273,13 +281,13 @@ export class LiveComponent implements OnInit {
     holder.append(video);
     videoGrid.prepend(holder);
   }
-  connectToNewUser(peerId: any, stream: any, usertype: string) {
+  connectToNewUser(peerId: any, myStream: any, usertype: string) {
     const alreadyExist = this.peers[peerId];
-    console.log('connecting to peers', peerId, this.peers, alreadyExist);
+    // console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
-      const call = this.callService.getPeer()?.call(peerId, stream);
+      const call = this.callService.getPeer()?.call(peerId, myStream);
       console.log('call: ', call);
 
       call?.on('stream', (userVideoStream: any) => {
