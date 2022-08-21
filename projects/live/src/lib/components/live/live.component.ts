@@ -91,7 +91,7 @@ export class LiveComponent implements OnInit {
       const peerVideo = document.createElement('video');
 
       call.on('stream', (peerStream) => {
-        this.addVideoStream(peerVideo, peerStream);
+        this.addVideoStream(peerVideo, peerStream, '');
       });
     });
 
@@ -102,7 +102,7 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      this.addVideoStream(myVideo, this.myStream);
+      this.addVideoStream(myVideo, this.myStream, 'You');
 
       // this.callService.getPeer()?.on('call', (call: any) => {
       //   call.answer(this.myStream);
@@ -154,7 +154,7 @@ export class LiveComponent implements OnInit {
         console.log('isadmitted: ', result);
 
         this.isAdmitted = true;
-        this.addVideoStream(myVideo, this.myStream);
+        this.addVideoStream(myVideo, this.myStream, 'You');
         this.socket.emit(
           'join-room',
           this.ROOM_ID,
@@ -247,7 +247,7 @@ export class LiveComponent implements OnInit {
     });
     videoGrid.append(video);
   }
-  addVideoStream(video: HTMLVideoElement, stream: any, usertype?: string) {
+  addVideoStream(video: HTMLVideoElement, stream: any, username: string) {
     this.users.push({ stream: stream });
     console.log('my stream: ', stream);
 
@@ -290,7 +290,7 @@ export class LiveComponent implements OnInit {
 
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
-    usernameLabl.innerText = this.username;
+    usernameLabl.innerText = username;
     usernameLabl.className = 'text-white';
     holder.prepend(usernameLabl);
     videoGrid.prepend(holder);
