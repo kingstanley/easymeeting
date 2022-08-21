@@ -65,6 +65,7 @@ export class LiveComponent implements OnInit {
           this.meeting = meeting;
           console.log('meeting: ', meeting);
           if (this.user?.email == this.meeting.host) {
+            this.username = this.user.name.split(' ')[0];
             this.isAdmitted = true;
             this.socket.emit(
               'join-room',
@@ -84,7 +85,10 @@ export class LiveComponent implements OnInit {
     // (async () => {
     await this.getMediaStream();
     // })();
-
+    // this.callService.getPeer()?.d;
+    // username', (data) => {
+    //   console.log('data from username peer event: ', data);
+    // });
     if (this.myStream) this.callService.initPeer();
     this.callService.getPeer()?.on('call', (call) => {
       call.answer(this.myStream);
@@ -249,7 +253,7 @@ export class LiveComponent implements OnInit {
   }
   addVideoStream(video: HTMLVideoElement, stream: any, username: string) {
     this.users.push({ stream: stream });
-    console.log('my stream: ', stream);
+    // console.log('my stream: ', stream);
 
     // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
@@ -262,8 +266,8 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    if (this.users.length <= 2) {
-      this.constrainWidth.ideal = 1000;
+    if (this.users.length <= 1) {
+      this.constrainWidth.ideal = 500;
       holder.className = 'item';
       (async () => {
         await this.getMediaStream();
@@ -301,7 +305,21 @@ export class LiveComponent implements OnInit {
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
+      const conn = this.callService
+        .getPeer()
+        ?.connect(peerId)
+        .on('error', (err) => {
+          console.log('error getting dataChannel: ', err);
+        });
+
       const call = this.callService.getPeer()?.call(peerId, myStream);
+      conn?.send({
+        username: this.username,
+        peerId: this.callService.getPeer()?.id,
+      });
+      conn?.on('data', (data) => {
+        console.log('data from dataChannel: ', data);
+      });
       console.log('call: ', call);
 
       call?.on('stream', (userVideoStream: any) => {
