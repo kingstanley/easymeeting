@@ -2,7 +2,7 @@
    .ask-screen {
      display: flex;
      flex-direction: row;
-     overflow-y: hidden;
+     overflow-y: scroll;
      gap: 5px;
      flex-wrap: wrap;
      height: 100vh;
