@@ -108,14 +108,14 @@ export class LiveComponent implements OnInit {
       console.log('my stream is ', this.myStream);
       this.addVideoStream(myVideo, this.myStream, 'You');
 
-      // this.callService.getPeer()?.on('call', (call: any) => {
-      //   call.answer(this.myStream);
-      //   const peerVideo = document.createElement('video');
+      this.callService.getPeer()?.on('call', (call: any) => {
+        call.answer(this.myStream);
+        const peerVideo = document.createElement('video');
 
-      //   call.on('stream', (peerStream: any) => {
-      //     this.addVideoStream(peerVideo, peerStream);
-      //   });
-      // });
+        call.on('stream', (peerStream: any) => {
+          this.addVideoStream(peerVideo, peerStream, '');
+        });
+      });
     }
     this.chatService.Socket.on(
       'user-connected',
@@ -311,15 +311,17 @@ export class LiveComponent implements OnInit {
         .on('error', (err) => {
           console.log('error getting dataChannel: ', err);
         });
-
+      conn?.on('open', () => {
+        conn?.send({
+          username: this.username,
+          peerId: this.callService.getPeer()?.id,
+        });
+        conn?.on('data', (data) => {
+          console.log('data from dataChannel: ', data);
+        });
+      });
       const call = this.callService.getPeer()?.call(peerId, myStream);
-      conn?.send({
-        username: this.username,
-        peerId: this.callService.getPeer()?.id,
-      });
-      conn?.on('data', (data) => {
-        console.log('data from dataChannel: ', data);
-      });
+
       console.log('call: ', call);
 
       call?.on('stream', (userVideoStream: any) => {
