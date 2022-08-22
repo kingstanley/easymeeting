@@ -85,14 +85,14 @@ export class LiveComponent implements OnInit {
     await this.getMediaStream();
 
     if (this.myStream) this.callService.initPeer();
-    this.callService.getPeer()?.on('call', (call) => {
-      call.answer(this.myStream);
-      const peerVideo = document.createElement('video');
+    // this.callService.getPeer()?.on('call', (call) => {
+    //   call.answer(this.myStream);
+    //   const peerVideo = document.createElement('video');
 
-      call.on('stream', (peerStream) => {
-        this.addVideoStream(peerVideo, peerStream, '', '');
-      });
-    });
+    //   call.on('stream', (peerStream) => {
+    //     this.addVideoStream(peerVideo, peerStream, '', '');
+    //   });
+    // });
 
     const myVideo = document.createElement('video');
     myVideo.muted = true;
