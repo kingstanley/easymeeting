@@ -1,10 +1,12 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import { AuthService } from 'projects/account/src/lib/components/services/auth.service';
+import { UserService } from 'projects/account/src/lib/components/services/user.service';
 import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
@@ -45,16 +47,7 @@ export class LiveComponent implements OnInit {
   async ngOnInit() {
     this.user = this.authService.getUser();
     console.log('loggedIn user: ', this.user);
-    this.socket.on(
-      'admin-details',
-      (data: { peerId: string; socketId: string; username: string }) => {
-        this.users.push({
-          peerId: data.peerId,
-          socketId: data.socketId,
-          username: data.username,
-        });
-      }
-    );
+
     this.chatService
       .helloMessage()
       .subscribe((response) => console.log('hello response: ', response));
@@ -82,7 +75,6 @@ export class LiveComponent implements OnInit {
               this.username
             );
           }
-          // add self to users list
         });
     });
 
@@ -92,15 +84,12 @@ export class LiveComponent implements OnInit {
     this.callService.getPeer()?.on('call', (call) => {
       call.answer(this.myStream);
       const peerVideo = document.createElement('video');
+
       call.on('stream', (peerStream) => {
         this.addVideoStream(peerVideo, peerStream, '', '');
       });
     });
-    this.users.push({
-      peerId: this.callService.getPeer()?.id,
-      socketId: this.socket.ioSocket.id,
-      username: this.username,
-    });
+
     const myVideo = document.createElement('video');
     myVideo.muted = true;
 
@@ -108,17 +97,14 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      const myPeerId = this.callService.getPeer()?.id || '';
-      this.addVideoStream(myVideo, this.myStream, 'You', myPeerId);
+      this.addVideoStream(myVideo, this.myStream, 'You', this.myStream.id);
 
       this.callService.getPeer()?.on('call', (call) => {
         call.answer(this.myStream);
         const peerVideo = document.createElement('video');
 
         call.on('stream', (peerStream) => {
-          console.log('user stream on init cal: ', peerStream);
-
-          this.addVideoStream(peerVideo, peerStream, '', '');
+          this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
         });
       });
     }
@@ -127,7 +113,7 @@ export class LiveComponent implements OnInit {
       (peerId: string | any, socketId: string, username: string) => {
         console.log('new user peerId: ', peerId);
         this.users.push({ peerId, socketId, username });
-        this.connectToNewUser(peerId, this.myStream, socketId, username);
+        this.connectToNewUser(peerId, this.myStream, username);
       }
     );
     this.socket.on(
@@ -281,10 +267,6 @@ export class LiveComponent implements OnInit {
     console.log('users: ', this.users);
     const holder = document.createElement('div');
     holder.id = peerId;
-    if (!username) {
-      const user = this.users.find((user) => user.peerId == peerId);
-      if (user) username = user?.username;
-    }
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
       holder.className = 'item card  bg-dark position-relative';
@@ -320,27 +302,12 @@ export class LiveComponent implements OnInit {
 
     // create element for mutting user remotely
     const mic = document.createElement('button');
-    mic.id = `mic-${peerId}`;
     mic.className = 'btn btn-secondary';
-    mic.style.cursor = 'pointer';
-    mic.addEventListener('click', () => {
-      const user = this.users.find((user) => user.peerId == peerId);
-      this.socket.emit('mute', user?.socketId);
-    });
     mic.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
   <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
   <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
 </svg>`;
-    const micUnMute = document.createElement('button');
-    micUnMute.id = `mic-unmute-${peerId}`;
-    micUnMute.className = 'btn btn-secondary';
-    micUnMute.style.cursor = 'pointer';
-    micUnMute.addEventListener('click', () => {
-      const user = this.users.find((user) => user.peerId == peerId);
-      this.socket.emit('unmute', user?.socketId);
-    });
-    micUnMute.innerHTML = `<i class="bi bi-mic-mute"></i>`;
-
+    // mic.className =
     console.log('mic icon: ', mic);
     usernameLabl.innerText = username;
     usernameLabl.className = 'text-white username';
@@ -349,22 +316,10 @@ export class LiveComponent implements OnInit {
     holder.prepend(uholder);
     videoGrid.prepend(holder);
   }
-  connectToNewUser(
-    peerId: any,
-    myStream: any,
-    socketId: string,
-    username: string
-  ) {
+  connectToNewUser(peerId: any, myStream: any, username: string) {
     const alreadyExist = this.peers[peerId];
     // console.log('connecting to peers', peerId, this.peers, alreadyExist);
-    if (this.user?.email == this.meeting.host) {
-      this.socket.emit('admin-details', {
-        peerId: this.callService.getPeer()?.id,
-        userSocket: socketId,
-        adminSocketId: this.socket.ioSocket.id,
-        username: this.username,
-      });
-    }
+
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
       const call = this.callService.getPeer()?.call(peerId, myStream);
