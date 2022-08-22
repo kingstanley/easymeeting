@@ -262,7 +262,7 @@ export class LiveComponent implements OnInit {
       '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
-    video.className = '';
+    video.className = 'position-absolute';
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
@@ -297,11 +297,7 @@ export class LiveComponent implements OnInit {
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
     const uholder = document.createElement('div');
-    uholder.className = ' bg-secondary  position-absolute';
-    uholder.style.display = 'flex';
-    uholder.style.justifyContent = 'space-between';
-
-    // create element for mutting user remotely
+    uholder.className = ' bg-secondary  uholder position-absolute';
 
     usernameLabl.innerText = username;
     usernameLabl.className = 'text-white username';
@@ -315,6 +311,21 @@ export class LiveComponent implements OnInit {
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
+      // const conn = this.callService
+      //   .getPeer()
+      //   ?.connect(peerId)
+      //   .on('error', (err) => {
+      //     console.log('error getting dataChannel: ', err);
+      //   });
+      // conn?.on('open', () => {
+      //   conn?.send({
+      //     username: this.username,
+      //     peerId: this.callService.getPeer()?.id,
+      //   });
+      //   conn?.on('data', (data) => {
+      //     console.log('data from dataChannel: ', data);
+      //   });
+      // });
       const call = this.callService.getPeer()?.call(peerId, myStream);
 
       console.log('call: ', call);
