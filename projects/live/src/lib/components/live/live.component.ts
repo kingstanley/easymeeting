@@ -83,11 +83,6 @@ export class LiveComponent implements OnInit {
             );
           }
           // add self to users list
-          this.users.push({
-            peerId: this.callService.getPeer()?.id,
-            socketId: this.socket.ioSocket.id,
-            username: this.username,
-          });
         });
     });
 
@@ -102,7 +97,11 @@ export class LiveComponent implements OnInit {
         this.addVideoStream(peerVideo, peerStream, '', '');
       });
     });
-
+    this.users.push({
+      peerId: this.callService.getPeer()?.id,
+      socketId: this.socket.ioSocket.id,
+      username: this.username,
+    });
     const myVideo = document.createElement('video');
     myVideo.muted = true;
 
