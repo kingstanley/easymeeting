@@ -101,14 +101,19 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      if (this.callService.getPeer()?.id) {
-        this.users.push({
-          peerId: this.callService.getPeer()?.id || this.username,
-          socketId: this.socket.ioSocket,
-          username: this.username,
-        });
-      }
-      this.addVideoStream(myVideo, this.myStream, 'You', this.myStream.id);
+      // if (this.callService.getPeer()?.id) {
+      //   this.users.push({
+      //     peerId: this.callService.getPeer()?.id || this.username,
+      //     socketId: this.socket.ioSocket.id,
+      //     username: this.username,
+      //   });
+      // }
+      this.addVideoStream(
+        myVideo,
+        this.myStream,
+        'You',
+        this.callService.getPeer()?.id || this.myStream.id
+      );
 
       this.callService.getPeer()?.on('call', (call) => {
         call.answer(this.myStream);
