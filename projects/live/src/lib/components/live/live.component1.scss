@@ -82,9 +82,11 @@
    }
 
    .uholder {
-     background: red;
-     border: solid blue 2px;
-     position: fixed;
-     top: 200;
-     left: 20;
+     display: flex;
+     justify-content: space-between;
+     align-items: stretch;
+   }
+
+   button {
+     cursor: hand;
    }
