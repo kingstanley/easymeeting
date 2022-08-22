@@ -336,7 +336,6 @@ export class LiveComponent implements OnInit {
         });
       });
       this.peers[peerId] = call;
-
       console.log('peers: ', this.peers);
     }
   }
