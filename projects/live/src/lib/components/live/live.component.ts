@@ -255,10 +255,6 @@ export class LiveComponent implements OnInit {
     username: string,
     peerId: string
   ) {
-    // this.users.push({ stream: stream });
-    // console.log('my stream: ', stream);
-
-    // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
       '.content'
     ) as HTMLDivElement;
@@ -267,6 +263,8 @@ export class LiveComponent implements OnInit {
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
+    console.log('username: ', username);
+    console.log('users: ', this.users);
     const holder = document.createElement('div');
     holder.id = peerId;
     if (this.users.length <= 1) {
