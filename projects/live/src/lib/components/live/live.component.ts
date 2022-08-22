@@ -1,7 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
@@ -41,8 +40,7 @@ export class LiveComponent implements OnInit {
     private msb: MatSnackBar,
     private dialog: MatDialog,
     private meetingService: MeetingService,
-    private authService: AuthService,
-    private matIcon: MatIcon
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -336,6 +334,7 @@ export class LiveComponent implements OnInit {
         });
       });
       this.peers[peerId] = call;
+
       console.log('peers: ', this.peers);
     }
   }
