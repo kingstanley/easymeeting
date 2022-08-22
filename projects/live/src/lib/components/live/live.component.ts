@@ -24,7 +24,12 @@ export class LiveComponent implements OnInit {
   averageRating = 0;
   isAdmitted = false;
   username = '';
-  users: Array<{ peerId: any; socketId: string; username: string }> = [];
+  users: Array<{
+    peerId: string;
+    username: string;
+    socketId: string;
+    stream?: any;
+  }> = [];
   constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream | any = new MediaStream();
@@ -96,22 +101,29 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
+      if (this.callService.getPeer()?.id) {
+        this.users.push({
+          peerId: this.callService.getPeer()?.id || this.username,
+          username: this.username,
+          socketId: this.socket.ioSocket,
+        });
+      }
       this.addVideoStream(myVideo, this.myStream, 'You', this.myStream.id);
 
-      this.callService.getPeer()?.on('call', (call) => {
-        call.answer(this.myStream);
-        const peerVideo = document.createElement('video');
+      // this.callService.getPeer()?.on('call', (call) => {
+      //   call.answer(this.myStream);
+      //   const peerVideo = document.createElement('video');
 
-        call.on('stream', (peerStream) => {
-          this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
-        });
-      });
+      //   call.on('stream', (peerStream) => {
+      //     this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
+      //   });
+      // });
     }
     this.chatService.Socket.on(
       'user-connected',
-      (peerId: string | any, socketId: string, username: string) => {
+      (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
-        this.users.push({ peerId, socketId, username });
+        this.users.push({ peerId: peerId, socketId, username: this.username });
         this.connectToNewUser(peerId, this.myStream, username);
       }
     );
@@ -160,7 +172,8 @@ export class LiveComponent implements OnInit {
           'join-room',
           this.ROOM_ID,
           this.callService.getPeer()?.id,
-          this.username
+          this.username,
+          this.socket.ioSocket.id
         );
         // console.log('isAdmitted: ', this.isAdmitted, result);
       } else {
@@ -254,15 +267,15 @@ export class LiveComponent implements OnInit {
     username: string,
     peerId: string
   ) {
-    // this.users.push({ stream: stream });
-    // console.log('my stream: ', stream);
+    console.log('users: ', this.users);
 
     // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
       '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
-    video.className = 'position-relative';
+    // video.autoplay;
+    //   console.log("My stream: ", stream);
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
@@ -270,7 +283,7 @@ export class LiveComponent implements OnInit {
     holder.id = peerId;
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
-      holder.className = 'item card  bg-dark position-relative';
+      holder.className = 'item';
       (async () => {
         await this.getMediaStream();
         console.log('new stream: ', this.myStream);
@@ -283,26 +296,22 @@ export class LiveComponent implements OnInit {
       })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
-      holder.className = 'item1 card  bg-dark position-relative';
+      holder.className = 'item1';
     }
     if (this.users.length <= 10 && this.users.length > 5) {
-      holder.className = 'item2 card  bg-dark position-relative';
+      holder.className = 'item2';
     }
     if (this.users.length > 10) {
-      holder.className = 'item3 card bg-dark position-relative';
+      holder.className = 'item3';
     }
 
     holder.append(video);
 
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
-    const uholder = document.createElement('div');
-    uholder.className = ' bg-secondary  uholder position-absolute';
-
     usernameLabl.innerText = username;
-    usernameLabl.className = 'text-white username';
-    uholder.append(usernameLabl);
-    holder.prepend(uholder);
+    usernameLabl.className = 'text-white';
+    holder.prepend(usernameLabl);
     videoGrid.prepend(holder);
   }
   connectToNewUser(peerId: any, myStream: any, username: string) {
