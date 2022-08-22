@@ -1,6 +1,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
@@ -24,7 +25,7 @@ export class LiveComponent implements OnInit {
   averageRating = 0;
   isAdmitted = false;
   username = '';
-  users: Array<{ stream: any }> = [];
+  users: Array<{ peerId: any; socketId: string; username: string }> = [];
   constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream | any = new MediaStream();
@@ -76,26 +77,16 @@ export class LiveComponent implements OnInit {
           }
         });
     });
-    // console.log(
-    //   'supported constraints: ',
-    //   navigator.mediaDevices.getSupportedConstraints()
-    // );
 
-    // this.callService.initPeer();
-    // (async () => {
     await this.getMediaStream();
-    // })();
-    // this.callService.getPeer()?.d;
-    // username', (data) => {
-    //   console.log('data from username peer event: ', data);
-    // });
+
     if (this.myStream) this.callService.initPeer();
     this.callService.getPeer()?.on('call', (call) => {
       call.answer(this.myStream);
       const peerVideo = document.createElement('video');
 
       call.on('stream', (peerStream) => {
-        this.addVideoStream(peerVideo, peerStream, '');
+        this.addVideoStream(peerVideo, peerStream, '', '');
       });
     });
 
@@ -106,21 +97,22 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      this.addVideoStream(myVideo, this.myStream, 'You');
+      this.addVideoStream(myVideo, this.myStream, 'You', this.myStream.id);
 
-      this.callService.getPeer()?.on('call', (call: any) => {
+      this.callService.getPeer()?.on('call', (call) => {
         call.answer(this.myStream);
         const peerVideo = document.createElement('video');
 
-        call.on('stream', (peerStream: any) => {
-          this.addVideoStream(peerVideo, peerStream, '');
+        call.on('stream', (peerStream) => {
+          this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
         });
       });
     }
     this.chatService.Socket.on(
       'user-connected',
-      (peerId: string | any, username: string) => {
+      (peerId: string | any, socketId: string, username: string) => {
         console.log('new user peerId: ', peerId);
+        this.users.push({ peerId, socketId, username });
         this.connectToNewUser(peerId, this.myStream, username);
       }
     );
@@ -146,6 +138,7 @@ export class LiveComponent implements OnInit {
       console.log('disconnected userId: ', peerId);
       if (this.peers[peerId]) {
         this.peers[peerId].close();
+        // remove the div container holding the details of the exiting user
       }
     });
 
@@ -158,7 +151,12 @@ export class LiveComponent implements OnInit {
         console.log('isadmitted: ', result);
 
         this.isAdmitted = true;
-        this.addVideoStream(myVideo, this.myStream, 'You');
+        this.addVideoStream(
+          myVideo,
+          this.myStream,
+          'You',
+          this.callService.getPeer()?.id || this.username
+        );
         this.socket.emit(
           'join-room',
           this.ROOM_ID,
@@ -251,8 +249,13 @@ export class LiveComponent implements OnInit {
     });
     videoGrid.append(video);
   }
-  addVideoStream(video: HTMLVideoElement, stream: any, username: string) {
-    this.users.push({ stream: stream });
+  addVideoStream(
+    video: HTMLVideoElement,
+    stream: any,
+    username: string,
+    peerId: string
+  ) {
+    // this.users.push({ stream: stream });
     // console.log('my stream: ', stream);
 
     // this.resizeGrid();
@@ -260,15 +263,15 @@ export class LiveComponent implements OnInit {
       '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
-    // video.autoplay;
-    //   console.log("My stream: ", stream);
+    video.className = '';
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
     const holder = document.createElement('div');
+    holder.id = peerId;
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
-      holder.className = 'item';
+      holder.className = 'item card  bg-dark position-relative';
       (async () => {
         await this.getMediaStream();
         console.log('new stream: ', this.myStream);
@@ -281,22 +284,37 @@ export class LiveComponent implements OnInit {
       })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
-      holder.className = 'item1';
+      holder.className = 'item1 card  bg-dark position-relative';
     }
     if (this.users.length <= 10 && this.users.length > 5) {
-      holder.className = 'item2';
+      holder.className = 'item2 card  bg-dark position-relative';
     }
     if (this.users.length > 10) {
-      holder.className = 'item3';
+      holder.className = 'item3 card bg-dark position-relative';
     }
 
     holder.append(video);
 
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
+    const uholder = document.createElement('div');
+    uholder.className = ' bg-secondary  position-absolute';
+    uholder.style.display = 'flex';
+    uholder.style.justifyContent = 'space-between';
+
+    // create element for mutting user remotely
+    const mic = document.createElement('button');
+    mic.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
+  <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+  <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+</svg>`;
+    // mic.className =
+    console.log('mic icon: ', mic);
     usernameLabl.innerText = username;
-    usernameLabl.className = 'text-white';
-    holder.prepend(usernameLabl);
+    usernameLabl.className = 'text-white username';
+    uholder.append(usernameLabl);
+    uholder.append(mic);
+    holder.prepend(uholder);
     videoGrid.prepend(holder);
   }
   connectToNewUser(peerId: any, myStream: any, username: string) {
@@ -305,21 +323,6 @@ export class LiveComponent implements OnInit {
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
-      const conn = this.callService
-        .getPeer()
-        ?.connect(peerId)
-        .on('error', (err) => {
-          console.log('error getting dataChannel: ', err);
-        });
-      conn?.on('open', () => {
-        conn?.send({
-          username: this.username,
-          peerId: this.callService.getPeer()?.id,
-        });
-        conn?.on('data', (data) => {
-          console.log('data from dataChannel: ', data);
-        });
-      });
       const call = this.callService.getPeer()?.call(peerId, myStream);
 
       console.log('call: ', call);
@@ -328,12 +331,14 @@ export class LiveComponent implements OnInit {
         const userVideoExist = document.getElementById(peerId);
         if (!userVideoExist) {
           userVideo.id = peerId;
-          this.addVideoStream(userVideo, userVideoStream, username);
+          this.addVideoStream(userVideo, userVideoStream, username, peerId);
         } else {
           console.log('User video already exist');
         }
         call.on('close', () => {
           userVideo.remove();
+          // remove the container of the user video
+          document.getElementById(peerId)?.remove();
         });
       });
       this.peers[peerId] = call;

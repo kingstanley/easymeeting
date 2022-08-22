@@ -1,6 +1,19 @@
-<main>
+<main style="overflow-y: scroll">
   <div class="ask-screen " *ngIf="!isAdmitted">
     <div class="content ">
+      <!-- <div class="item">
+        <video autoplay muted loop id="myVideo">
+          <source src="assets/Feed.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+
+        <div class="content1">
+          <h1>Heading</h1>
+
+
+          <button id="myBtn" onclick="myFunction()">Pause</button>
+        </div>
+    </div>-->
     </div>
     <div class="action ">
       <mat-form-field appearance="outline">
@@ -13,6 +26,7 @@
     </div>
   </div>
   <div class="content" *ngIf="isAdmitted">
+
     <!-- <div class="item card bg-darg">
       <video src="assets/Feed.mp4"></video>
     </div>
@@ -30,3 +44,19 @@
     </div> -->
   </div>
 </main>
+<div class="fixed-bottom mb-4 text-center text-white" *ngIf="isAdmitted">
+  <button mat-button>
+    <mat-icon class="mat-18">video</mat-icon> Video
+  </button>
+  <button mat-button>audio
+    <mat-icon class="mat-18">microphone</mat-icon>
+  </button>
+  <button mat-button>
+    <mat-icon class="mat-18">more_horiz</mat-icon>
+    More
+  </button>
+  <button mat-button>
+    <mat-icon class="mat-18">end_call</mat-icon>
+    End
+  </button>
+</div>

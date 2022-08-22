@@ -2,7 +2,7 @@
    .ask-screen {
      display: flex;
      flex-direction: row;
-     overflow-y: scroll;
+     overflow: hidden;
      gap: 5px;
      flex-wrap: wrap;
      height: 100vh;
@@ -14,6 +14,7 @@
    .item {
      width: 4000px;
      height: auto;
+     position: relative;
      //  flex: 1;
    }
 
@@ -22,6 +23,7 @@
      width: 300px;
      height: auto;
      flex: 1;
+     position: relative;
    }
 
    .item2 {
@@ -52,6 +54,8 @@
      width: 100%;
      height: 100%;
      place-self: center;
+     object-fit: cover;
+     position: fixed;
    }
 
    .ask-screen {
@@ -75,4 +79,12 @@
      display: flex;
      flex-direction: row;
      gap: 10px;
+   }
+
+   .uholder {
+     background: red;
+     border: solid blue 2px;
+     position: fixed;
+     top: 200;
+     left: 20;
    }
