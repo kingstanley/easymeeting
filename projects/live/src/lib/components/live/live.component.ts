@@ -104,20 +104,20 @@ export class LiveComponent implements OnInit {
       if (this.callService.getPeer()?.id) {
         this.users.push({
           peerId: this.callService.getPeer()?.id || this.username,
-          username: this.username,
           socketId: this.socket.ioSocket,
+          username: this.username,
         });
       }
       this.addVideoStream(myVideo, this.myStream, 'You', this.myStream.id);
 
-      // this.callService.getPeer()?.on('call', (call) => {
-      //   call.answer(this.myStream);
-      //   const peerVideo = document.createElement('video');
+      this.callService.getPeer()?.on('call', (call) => {
+        call.answer(this.myStream);
+        const peerVideo = document.createElement('video');
 
-      //   call.on('stream', (peerStream) => {
-      //     this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
-      //   });
-      // });
+        call.on('stream', (peerStream) => {
+          this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
+        });
+      });
     }
     this.chatService.Socket.on(
       'user-connected',
@@ -283,7 +283,7 @@ export class LiveComponent implements OnInit {
     holder.id = peerId;
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
-      holder.className = 'item';
+      holder.className = 'item position-relative';
       (async () => {
         await this.getMediaStream();
         console.log('new stream: ', this.myStream);
@@ -296,21 +296,24 @@ export class LiveComponent implements OnInit {
       })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
-      holder.className = 'item1';
+      holder.className = 'item1 position-relative';
     }
     if (this.users.length <= 10 && this.users.length > 5) {
-      holder.className = 'item2';
+      holder.className = 'item2 position-relative';
     }
     if (this.users.length > 10) {
-      holder.className = 'item3';
+      holder.className = 'item3 position-relative';
     }
 
     holder.append(video);
-
+    if (username) {
+      const user = this.users.find((user) => user.peerId == peerId);
+      if (user) username = user.username;
+    }
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
     usernameLabl.innerText = username;
-    usernameLabl.className = 'text-white';
+    usernameLabl.className = 'text-white position-absolute';
     holder.prepend(usernameLabl);
     videoGrid.prepend(holder);
   }
@@ -320,21 +323,6 @@ export class LiveComponent implements OnInit {
 
     const userVideo = document.createElement('video');
     if (!alreadyExist) {
-      // const conn = this.callService
-      //   .getPeer()
-      //   ?.connect(peerId)
-      //   .on('error', (err) => {
-      //     console.log('error getting dataChannel: ', err);
-      //   });
-      // conn?.on('open', () => {
-      //   conn?.send({
-      //     username: this.username,
-      //     peerId: this.callService.getPeer()?.id,
-      //   });
-      //   conn?.on('data', (data) => {
-      //     console.log('data from dataChannel: ', data);
-      //   });
-      // });
       const call = this.callService.getPeer()?.call(peerId, myStream);
 
       console.log('call: ', call);
