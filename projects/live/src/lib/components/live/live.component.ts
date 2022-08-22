@@ -262,7 +262,7 @@ export class LiveComponent implements OnInit {
       '.content'
     ) as HTMLDivElement;
     video.srcObject = stream;
-    video.className = 'position-absolute';
+    video.className = 'position-relative';
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
