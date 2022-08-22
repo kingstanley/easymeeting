@@ -128,7 +128,7 @@ export class LiveComponent implements OnInit {
       'user-connected',
       (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
-        this.users.push({ peerId: peerId, socketId, username: this.username });
+        this.users.push({ peerId: peerId, socketId, username: username });
         this.connectToNewUser(peerId, this.myStream, username);
       }
     );
