@@ -41,7 +41,8 @@ export class LiveComponent implements OnInit {
     private msb: MatSnackBar,
     private dialog: MatDialog,
     private meetingService: MeetingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private matIcon: MatIcon
   ) {}
 
   async ngOnInit() {
@@ -255,6 +256,10 @@ export class LiveComponent implements OnInit {
     username: string,
     peerId: string
   ) {
+    // this.users.push({ stream: stream });
+    // console.log('my stream: ', stream);
+
+    // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
       '.content'
     ) as HTMLDivElement;
@@ -263,8 +268,6 @@ export class LiveComponent implements OnInit {
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
-    console.log('username: ', username);
-    console.log('users: ', this.users);
     const holder = document.createElement('div');
     holder.id = peerId;
     if (this.users.length <= 1) {
@@ -301,18 +304,10 @@ export class LiveComponent implements OnInit {
     uholder.style.justifyContent = 'space-between';
 
     // create element for mutting user remotely
-    const mic = document.createElement('button');
-    mic.className = 'btn btn-secondary';
-    mic.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
-  <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
-  <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
-</svg>`;
-    // mic.className =
-    console.log('mic icon: ', mic);
+
     usernameLabl.innerText = username;
     usernameLabl.className = 'text-white username';
     uholder.append(usernameLabl);
-    uholder.append(mic);
     holder.prepend(uholder);
     videoGrid.prepend(holder);
   }
