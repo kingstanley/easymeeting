@@ -69,30 +69,33 @@ export class LiveComponent implements OnInit {
         .subscribe((meeting) => {
           this.meeting = meeting;
           console.log('meeting: ', meeting);
-          if (this.user?.email == this.meeting.host) {
-            this.username = this.user.name.split(' ')[0];
-            this.isAdmitted = true;
-            this.socket.emit(
-              'join-room',
-              this.ROOM_ID,
-              this.callService.getPeer()?.id,
-              this.username
-            );
-          }
+
+          // if (this.isAdmin()) {
+          //   this.username = this.user.name.split(' ')[0];
+          //   this.isAdmitted = true;
+          //   this.socket.emit(
+          //     'join-room',
+          //     this.ROOM_ID,
+          //     this.callService.getPeer()?.id,
+          //     this.username
+          //   );
+          // }
         });
     });
 
     await this.getMediaStream();
 
     if (this.myStream) this.callService.initPeer();
-    // this.callService.getPeer()?.on('call', (call) => {
-    //   call.answer(this.myStream);
-    //   const peerVideo = document.createElement('video');
 
-    //   call.on('stream', (peerStream) => {
-    //     this.addVideoStream(peerVideo, peerStream, '', '');
-    //   });
-    // });
+    this.callService.getPeer()?.on('call', (call) => {
+      call.answer(this.myStream);
+      const peerVideo = document.createElement('video');
+
+      call.on('stream', (peerStream) => {
+        console.log('user received call stream: ', peerStream);
+        this.addVideoStream(peerVideo, peerStream, '', '');
+      });
+    });
 
     const myVideo = document.createElement('video');
     myVideo.muted = true;
@@ -101,13 +104,13 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      // if (this.callService.getPeer()?.id) {
-      //   this.users.push({
-      //     peerId: this.callService.getPeer()?.id || this.username,
-      //     socketId: this.socket.ioSocket.id,
-      //     username: this.username,
-      //   });
-      // }
+      if (this.callService.getPeer()?.id) {
+        this.users.push({
+          peerId: this.callService.getPeer()?.id || this.username,
+          socketId: this.socket.ioSocket.id,
+          username: this.username,
+        });
+      }
       this.addVideoStream(
         myVideo,
         this.myStream,
@@ -115,14 +118,14 @@ export class LiveComponent implements OnInit {
         this.callService.getPeer()?.id || this.myStream.id
       );
 
-      this.callService.getPeer()?.on('call', (call) => {
-        call.answer(this.myStream);
-        const peerVideo = document.createElement('video');
+      // this.callService.getPeer()?.on('call', (call) => {
+      //   call.answer(this.myStream);
+      //   const peerVideo = document.createElement('video');
 
-        call.on('stream', (peerStream) => {
-          this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
-        });
-      });
+      //   call.on('stream', (peerStream) => {
+      //     this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
+      //   });
+      // });
     }
     this.chatService.Socket.on(
       'user-connected',
@@ -137,7 +140,7 @@ export class LiveComponent implements OnInit {
       (roomId: string, username: string, socketId: string, email: string) => {
         console.log('ask to join data: ', roomId, username, socketId);
 
-        if (!email) {
+        if (!email && this.isAdmin()) {
           this.dialog
             .open(AdmitComponent, {
               data: { roomId, username, socketId },
@@ -166,6 +169,8 @@ export class LiveComponent implements OnInit {
       if (result) {
         console.log('isadmitted: ', result);
 
+        const action = document.getElementById('action') as HTMLDivElement;
+        action.style.display = 'none';
         this.isAdmitted = true;
         this.addVideoStream(
           myVideo,
@@ -203,6 +208,33 @@ export class LiveComponent implements OnInit {
         duration: 3000,
       });
     }
+  }
+  isAdmin() {
+    return this.user.email == this.meeting?.host;
+  }
+  joinAsAdmin() {
+    // document
+    //   .getElementById(this.callService.getPeer()?.id || this.myStream.id)
+    //   ?.remove();
+    this.username = this.user.name.split(' ')[0];
+    this.isAdmitted = true;
+    const action = document.getElementById('action') as HTMLDivElement;
+    action.style.display = 'none';
+    this.socket.emit(
+      'join-room',
+      this.ROOM_ID,
+      this.callService.getPeer()?.id,
+      this.username
+    );
+    const myVideo = document.createElement('video');
+    myVideo.muted = true;
+
+    this.addVideoStream(
+      myVideo,
+      this.myStream,
+      'You',
+      this.callService.getPeer()?.id || this.myStream.id
+    );
   }
   cancelJoin() {
     console.log('cancel join');
@@ -278,9 +310,10 @@ export class LiveComponent implements OnInit {
     const videoGrid: HTMLDivElement = document.querySelector(
       '.content'
     ) as HTMLDivElement;
+    console.log('videoGrid on top: ', videoGrid);
     video.srcObject = stream;
-    // video.autoplay;
-    //   console.log("My stream: ", stream);
+
+    console.log('adding stream after admitted: ', stream);
     video.addEventListener('loadedmetadata', () => {
       video.play();
     });
@@ -291,13 +324,13 @@ export class LiveComponent implements OnInit {
       holder.className = 'item position-relative';
       (async () => {
         await this.getMediaStream();
-        console.log('new stream: ', this.myStream);
+        console.log('new stream with ideal 500: ', this.myStream);
       })();
     } else {
       this.constrainWidth.ideal = 400;
       (async () => {
         await this.getMediaStream();
-        console.log('new stream: ', this.myStream);
+        console.log('new stream with ideal 400: ', this.myStream);
       })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
@@ -309,18 +342,23 @@ export class LiveComponent implements OnInit {
     if (this.users.length > 10) {
       holder.className = 'item3 position-relative';
     }
-
     holder.append(video);
     if (username) {
+      console.log('no username');
+
       const user = this.users.find((user) => user.peerId == peerId);
+      console.log('but user found: ', user);
+
       if (user) username = user.username;
     }
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
     usernameLabl.innerText = username;
     usernameLabl.className = 'text-white position-absolute';
+
     holder.prepend(usernameLabl);
     videoGrid.prepend(holder);
+    console.log('videoGrid: ', videoGrid);
   }
   connectToNewUser(peerId: any, myStream: any, username: string) {
     const alreadyExist = this.peers[peerId];
