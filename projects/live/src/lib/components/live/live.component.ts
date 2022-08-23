@@ -69,17 +69,10 @@ export class LiveComponent implements OnInit {
         .subscribe((meeting) => {
           this.meeting = meeting;
           console.log('meeting: ', meeting);
-
-          // if (this.isAdmin()) {
-          //   this.username = this.user.name.split(' ')[0];
-          //   this.isAdmitted = true;
-          //   this.socket.emit(
-          //     'join-room',
-          //     this.ROOM_ID,
-          //     this.callService.getPeer()?.id,
-          //     this.username
-          //   );
-          // }
+          if (this.isAdmin()) {
+            this.username = this.user.name.split(' ')[0];
+            console.log('username: ', this.username);
+          }
         });
     });
 
@@ -210,12 +203,12 @@ export class LiveComponent implements OnInit {
     }
   }
   isAdmin() {
-    return this.user.email == this.meeting?.host;
+    return this.user?.email == this.meeting?.host;
   }
   joinAsAdmin() {
-    // document
-    //   .getElementById(this.callService.getPeer()?.id || this.myStream.id)
-    //   ?.remove();
+    document
+      .getElementById(this.callService.getPeer()?.id || this.myStream.id)
+      ?.remove();
     this.username = this.user.name.split(' ')[0];
     this.isAdmitted = true;
     const action = document.getElementById('action') as HTMLDivElement;

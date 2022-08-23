@@ -8,9 +8,9 @@
         <input matInput [(ngModel)]="username" placeholder="Name or organization">
       </mat-form-field>
       <div class="buttons">
-        <button *ngIf="!isAdmin()" mat-raised-button (click)="askToJoin()" color="primary">Ask to Join</button><button
-          *ngIf="isAdmin()" mat-raised-button (click)="joinAsAdmin()" color="primary"> Join</button> <button
-          mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
+        <button *ngIf="!isAdmin()" mat-raised-button (click)="askToJoin()" color="primary">Ask to Join</button>
+        <button *ngIf="isAdmin()" mat-raised-button (click)="joinAsAdmin()" color="primary">Join</button>
+        <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
       </div>
     </div>
   </div>
