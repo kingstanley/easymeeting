@@ -110,15 +110,6 @@ export class LiveComponent implements OnInit {
         'You',
         this.callService.getPeer()?.id || this.myStream.id
       );
-
-      // this.callService.getPeer()?.on('call', (call) => {
-      //   call.answer(this.myStream);
-      //   const peerVideo = document.createElement('video');
-
-      //   call.on('stream', (peerStream) => {
-      //     this.addVideoStream(peerVideo, peerStream, '', peerStream.id);
-      //   });
-      // });
     }
     this.chatService.Socket.on(
       'user-connected',
@@ -314,7 +305,7 @@ export class LiveComponent implements OnInit {
     holder.id = peerId;
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
-      holder.className = 'item position-relative';
+      holder.className = 'item position-relative card bg-dark';
       (async () => {
         await this.getMediaStream();
         console.log('new stream with ideal 500: ', this.myStream);
@@ -327,13 +318,13 @@ export class LiveComponent implements OnInit {
       })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
-      holder.className = 'item1 position-relative';
+      holder.className = 'item1 position-relative card bg-dark';
     }
     if (this.users.length <= 10 && this.users.length > 5) {
-      holder.className = 'item2 position-relative';
+      holder.className = 'item2 position-relative card bg-dark';
     }
     if (this.users.length > 10) {
-      holder.className = 'item3 position-relative';
+      holder.className = 'item3 position-relative card bg-dark';
     }
     holder.append(video);
     if (username) {
