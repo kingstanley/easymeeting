@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-actions',
@@ -7,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ActionsComponent implements OnInit {
   constructor() {}
-
+  @Output() emitEndCall: EventEmitter<boolean> = new EventEmitter(false);
   ngOnInit() {}
+  endCall() {
+    this.emitEndCall.emit(true);
+  }
 }

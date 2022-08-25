@@ -223,6 +223,7 @@ export class LiveComponent implements OnInit {
   cancelJoin() {
     console.log('cancel join');
   }
+
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -372,5 +373,20 @@ export class LiveComponent implements OnInit {
 
       console.log('peers: ', this.peers);
     }
+  }
+  endCall(result: boolean) {
+    console.log('end call clicked');
+    // this.myStream = null;
+    this.socket.disconnect('user-disconnected');
+    this.callService.getPeer()?.destroy();
+
+    const tracks = this.myStream.getTracks();
+
+    tracks.forEach((track: MediaStreamTrack) => {
+      console.log('track: ', track);
+
+      track.stop();
+    });
+    window.location.href = '/meeting/';
   }
 }

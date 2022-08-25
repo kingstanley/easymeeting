@@ -16,4 +16,4 @@
   </div>
 
 </main>
-<app-actions class="action-buttons" *ngIf="isAdmitted"></app-actions>
+<app-actions (emitEndCall)="endCall($event)" class="action-buttons" *ngIf="isAdmitted"></app-actions>
