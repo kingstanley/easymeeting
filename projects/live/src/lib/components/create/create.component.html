@@ -1,5 +1,5 @@
 <mat-card id="create">
-  <mat-card class="form-card">
+  <mat-card class="form-card" *ngIf="!showShareCard" style="border:1 solid  white;">
     <form [formGroup]="createForm">
       <h3>Create Meeting</h3>
       <div style="display: flex;flex-direction: row; gap:20px; margin: 20px;">
@@ -23,18 +23,47 @@
       </div>
       <mat-form-field class="input" appearance="fill">
         <mat-label>Title</mat-label>
-        <!-- <mat-icon matPreffix>account_circle</mat-icon> -->
+
         <input id="title" type="text" placeholder="Enter your meeting title" matInput formControlName="title">
       </mat-form-field>
       <mat-form-field class="input" appearance="fill">
         <mat-label>Description</mat-label>
-        <!-- <mat-icon matPreffix>lock</mat-icon> -->
+
         <textarea id="description" type="text" placeholder="Enter meeting description" matInput
           formControlName="description"></textarea>
       </mat-form-field>
+      <mat-form-field appearance="fill" class="input">
+        <mat-label>Guests </mat-label>
+        <input type="text" placeholder="Enter list of emails seperated by (,) to invite via email" matInput
+          formControlName="guests">
+      </mat-form-field>
+
       <meet-button (emitSubmit)="submit()" [isProcessing]="isProcessing" label="Submit" color="warn" iconColor="warn">
       </meet-button>
 
     </form>
+  </mat-card>
+  <!-- Share card -->
+  <mat-card style="width: 400px; text-align: center;" *ngIf="showShareCard">
+    <h3>Invite people to your new meeting</h3>
+    <small>You can either copy the meeting link and send to your guest via other channels or
+      just send via email</small>
+    <input class="m-1" readonly [value]="meetingUlr" style="">
+
+    <mat-menu #shareMenu="matMenu">
+      <ng-template matMenuContent>
+        <button mat-menu-item (click)="copyLink()">Copy
+          <mat-icon class="mat-18 m-4">file_copy</mat-icon>
+        </button>
+        <button mat-menu-item (click)="sendViaEmail()">Send to Email <mat-icon class="mat-18 m-4"> email</mat-icon>
+        </button>
+      </ng-template>
+    </mat-menu>
+
+    <button mat-icon-button #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="shareMenu"
+      (mouseleave)="mouseLeaveMenu(menuTrigger)" (mouseenter)="mouseEnterMenu(menuTrigger)">
+      <mat-icon class="mat-18">share</mat-icon>
+    </button>
+    <button mat-raised-button color="accent" class="m-4" (click)="startMeeting()">Start meeting</button>
   </mat-card>
 </mat-card>
