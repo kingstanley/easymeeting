@@ -1,9 +1,9 @@
-<main style="overflow-y: scroll">
+<main style="overflow-y: scroll" id="main">
   <div class="ask-screen ">
     <div class="content">
 
     </div>
-    <div class="action " id="action">
+    <div class="action" id="action">
       <mat-form-field appearance="outline">
         <input matInput [(ngModel)]="username" placeholder="Name or organization">
       </mat-form-field>
@@ -14,38 +14,6 @@
       </div>
     </div>
   </div>
-  <!-- <div class="content"> -->
 
-  <!-- <div class="item card bg-darg">
-      <video src="assets/Feed.mp4"></video>
-    </div>
-    <div class="item card bg-dark">
-      <video src="assets/resubmission-video-v2.mp4"></video>
-    </div>
-    <div class="item card bg-dark">
-      <video src="assets/Feed.mp4"></video>
-    </div>
-    <div class="item card bg-dark">
-      <video src="assets/Feed.mp4"></video>
-    </div>
-    <div class="item card bg-dark">
-      <video src="assets/resubmission-video-v2.mp4"></video>
-    </div> -->
-  <!-- </div> -->
 </main>
-<div class="fixed-bottom mb-4 text-center text-white" *ngIf="isAdmitted">
-  <button mat-button id="vid" #vid>
-    <mat-icon class="mat-18">video</mat-icon> Video
-  </button>
-  <button mat-button>audio
-    <mat-icon class="mat-18">microphone</mat-icon>
-  </button>
-  <button mat-button>
-    <mat-icon class="mat-18">more_horiz</mat-icon>
-    More
-  </button>
-  <button mat-button>
-    <mat-icon class="mat-18">end_call</mat-icon>
-    End
-  </button>
-</div>
+<app-actions class="action-buttons" *ngIf="isAdmitted"></app-actions>

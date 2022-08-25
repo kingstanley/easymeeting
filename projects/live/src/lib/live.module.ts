@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateComponent } from './components/create/create.component';
 import { JoinComponent } from './components/join/join.component';
 import { ContainerComponent } from './components/container/container.component';
+import { ActionsComponent } from './components/actions/actions.component';
 import { AngularMaterialModule } from 'projects/angular-material/src';
 import { SharedModule } from 'projects/shared/src';
 
@@ -16,6 +17,7 @@ import { SharedModule } from 'projects/shared/src';
     CreateComponent,
     JoinComponent,
     ContainerComponent,
+    ActionsComponent,
   ],
   imports: [
     LiveRoutes,
