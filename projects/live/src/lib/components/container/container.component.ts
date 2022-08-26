@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
@@ -78,4 +78,23 @@ export class ContainerComponent implements OnInit {
       code ? code : this.meetLinkControl.value,
     ]);
   }
+  // keyPressEvent(event: KeyboardEvent) {
+  //   console.log('event: ', event);
+  //   if (event.key == 'Enter' || event['keyCode'] == 13) {
+  //     this.joinMeeting();
+  //   }
+  // }
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    console.log(event);
+
+    if (event.keyCode === KEY_CODE.ENTER || event.key == 'Enter') {
+      this.joinMeeting();
+    }
+  }
+}
+export enum KEY_CODE {
+  RIGHT_ARROW = 39,
+  LEFT_ARROW = 37,
+  ENTER = 13,
 }

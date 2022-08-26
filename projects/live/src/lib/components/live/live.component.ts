@@ -5,7 +5,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import { AuthService } from 'projects/account/src/lib/components/services/auth.service';
-import { UserService } from 'projects/account/src/lib/components/services/user.service';
 import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
@@ -32,10 +31,27 @@ export class LiveComponent implements OnInit {
   }> = [];
   constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
-  myStream: MediaStream | any = new MediaStream();
+  myStream: MediaStream = new MediaStream();
   isPeerOpend = false;
   meeting: any;
   user: any;
+  showButtons = false;
+  useVideo:
+    | boolean
+    | {
+        width: {
+          min: number;
+          ideal: number;
+          max: number;
+        };
+        // height: {
+        //   min: this.constrainHeight.min,
+        //   ideal: this.constrainHeight.ideal,
+        //   max: this.constrainHeight.max,
+        // },
+        facingMode: 'user';
+      } = true;
+  useAudio: boolean | MediaTrackConstraints | undefined = true;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -46,7 +62,11 @@ export class LiveComponent implements OnInit {
     private dialog: MatDialog,
     private meetingService: MeetingService,
     private authService: AuthService
-  ) {}
+  ) {
+    setTimeout(() => {
+      this.showButtons = true;
+    }, 3000);
+  }
 
   async ngOnInit() {
     this.user = this.authService.getUser();
@@ -226,20 +246,23 @@ export class LiveComponent implements OnInit {
 
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: {
-        width: {
-          min: this.constrainWidth.min,
-          ideal: this.constrainWidth.ideal,
-          max: this.constrainWidth.max,
-        },
-        // height: {
-        //   min: this.constrainHeight.min,
-        //   ideal: this.constrainHeight.ideal,
-        //   max: this.constrainHeight.max,
-        // },
-        facingMode: 'user',
-      },
+      audio: this.useAudio,
+      video:
+        this.useVideo == false
+          ? this.useVideo
+          : {
+              width: {
+                min: this.constrainWidth.min,
+                ideal: this.constrainWidth.ideal,
+                max: this.constrainWidth.max,
+              },
+              // height: {
+              //   min: this.constrainHeight.min,
+              //   ideal: this.constrainHeight.ideal,
+              //   max: this.constrainHeight.max,
+              // },
+              facingMode: 'user',
+            },
     });
   }
   resizeGrid() {
@@ -388,5 +411,53 @@ export class LiveComponent implements OnInit {
       track.stop();
     });
     window.location.href = '/meeting/';
+  }
+  toggleMic(value: boolean) {
+    if (value) {
+      this.useAudio = false;
+    } else {
+      this.useAudio = true;
+    }
+    this.getMediaStream();
+  }
+  toggleCam(value: boolean) {
+    this.useVideo = !this.useVideo;
+    if (!value) {
+      this.useVideo = {
+        width: {
+          min: this.constrainWidth.min,
+          ideal: this.constrainWidth.ideal,
+          max: this.constrainWidth.max,
+        },
+        // height: {
+        //   min: this.constrainHeight.min,
+        //   ideal: this.constrainHeight.ideal,
+        //   max: this.constrainHeight.max,
+        // },
+        facingMode: 'user',
+      };
+    } else {
+      this.useVideo = false;
+    }
+    (async () => {
+      const videoCon = document.getElementById(
+        this.callService.getPeer()?.id || ''
+      ) as HTMLElement;
+      const myVideo = videoCon.getElementsByTagName('video')[0];
+      myVideo.remove();
+
+      console.log('async function running');
+      const tracks = this.myStream.getVideoTracks();
+      tracks.forEach((track) => track.stop());
+      console.log('media: ', this.myStream.id);
+      console.log('toggle video: ', value, this.useVideo);
+      await this.getMediaStream();
+      console.log('media 1: ', this.myStream.id);
+      const newVideo = document.createElement('video');
+      newVideo.srcObject = this.myStream;
+      newVideo.muted = true;
+      newVideo.addEventListener('loadedmetadata', () => newVideo.play());
+      videoCon.append(newVideo);
+    })();
   }
 }
