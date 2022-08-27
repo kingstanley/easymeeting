@@ -106,16 +106,24 @@ export class LiveComponent implements OnInit {
       console.log('call object: ', call);
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
+        const user = this.users.find((user) => user.peerId == call.peer);
         this.addVideoStream(peerVideo, peerStream, '', '');
-        //  const userVideoExist = document.getElementById(peerId);
-        //  if (!userVideoExist) {
-        //    userVideo.id = peerId;
-        //    this.addVideoStream(userVideo, userVideoStream, username, peerId);
-        //  } else {
-        //    console.log('User video already exist');
-        //    userVideoExist.getElementsByTagName('video')[0].remove();
-        //    userVideoExist.append(userVideo);
-        //  }
+        const userVideoExist = document.getElementById(call.peer);
+        if (user) {
+          if (!userVideoExist) {
+            peerVideo.id = call.peer;
+            this.addVideoStream(
+              peerVideo,
+              peerStream,
+              user?.username,
+              call.peer
+            );
+          } else {
+            console.log('User video already exist');
+            userVideoExist.getElementsByTagName('video')[0].remove();
+            userVideoExist.append(peerVideo);
+          }
+        }
       });
     });
 
