@@ -358,16 +358,16 @@ export class LiveComponent implements OnInit {
     if (this.users.length <= 1) {
       this.constrainWidth.ideal = 500;
       holder.className = 'item position-relative card bg-dark';
-      (async () => {
-        await this.getMediaStream();
-        console.log('new stream with ideal 500: ', this.myStream);
-      })();
+      // (async () => {
+      //   await this.getMediaStream();
+      //   console.log('new stream with ideal 500: ', this.myStream);
+      // })();
     } else {
       this.constrainWidth.ideal = 400;
-      (async () => {
-        await this.getMediaStream();
-        console.log('new stream with ideal 400: ', this.myStream);
-      })();
+      // (async () => {
+      //   await this.getMediaStream();
+      //   console.log('new stream with ideal 400: ', this.myStream);
+      // })();
     }
     if (this.users.length <= 5 && this.users.length > 2) {
       holder.className = 'item1 position-relative card bg-dark';
@@ -450,12 +450,14 @@ export class LiveComponent implements OnInit {
     window.location.href = '/meeting/live/' + this.meeting.code;
   }
   toggleMic(value: boolean) {
-    if (value) {
-      this.useAudio = false;
-    } else {
-      this.useAudio = true;
+    const audioTrack = this.myStream
+      .getTracks()
+      .find((track) => track.kind == 'audio');
+    if (audioTrack) {
+      console.log('audio track: ', audioTrack);
+
+      audioTrack.enabled = !audioTrack?.enabled;
     }
-    this.getMediaStream();
   }
   toggleCam(value: boolean) {
     this.useVideo = !this.useVideo;
@@ -476,14 +478,19 @@ export class LiveComponent implements OnInit {
     } else {
       this.useVideo = false;
     }
-    this.myStream.getVideoTracks()[0].enabled =
-      !this.myStream.getVideoTracks()[0].enabled;
-    // (async () => {
-    const videoCon = document.getElementById(
-      this.callService.getPeer()?.id || ''
-    ) as HTMLElement;
-    const myVideo = videoCon.getElementsByTagName('video')[0];
-    myVideo.remove();
+    const videoTrack = this.myStream
+      .getTracks()
+      .find((track) => track.kind == 'video');
+    if (videoTrack) {
+      console.log('video track: ', videoTrack);
+
+      videoTrack.enabled = !videoTrack?.enabled;
+    }
+    // const videoCon = document.getElementById(
+    //   this.callService.getPeer()?.id || ''
+    // ) as HTMLElement;
+    // const myVideo = videoCon.getElementsByTagName('video')[0];
+    // myVideo.remove();
 
     //   console.log('async function running');
     //   const tracks = this.myStream.getVideoTracks();
@@ -493,11 +500,11 @@ export class LiveComponent implements OnInit {
     //   await this.getMediaStream();
     //   // this.socket.emit();
     //   console.log('media 1: ', this.myStream.id);
-    const newVideo = document.createElement('video');
-    newVideo.srcObject = this.myStream;
-    newVideo.muted = true;
-    newVideo.addEventListener('loadedmetadata', () => newVideo.play());
-    videoCon.append(newVideo);
+    // const newVideo = document.createElement('video');
+    // newVideo.srcObject = this.myStream;
+    // newVideo.muted = true;
+    // newVideo.addEventListener('loadedmetadata', () => newVideo.play());
+    // videoCon.append(newVideo);
     //   this.socket.emit(
     //     'join-room',
     //     this.ROOM_ID,
@@ -506,5 +513,10 @@ export class LiveComponent implements OnInit {
     //     this.socket.ioSocket.id
     //   );
     // })();
+  }
+  ngDestroy() {
+    this.myStream.getTracks().forEach((track) => {
+      track.stop();
+    });
   }
 }
