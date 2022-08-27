@@ -107,6 +107,15 @@ export class LiveComponent implements OnInit {
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
         this.addVideoStream(peerVideo, peerStream, '', '');
+        //  const userVideoExist = document.getElementById(peerId);
+        //  if (!userVideoExist) {
+        //    userVideo.id = peerId;
+        //    this.addVideoStream(userVideo, userVideoStream, username, peerId);
+        //  } else {
+        //    console.log('User video already exist');
+        //    userVideoExist.getElementsByTagName('video')[0].remove();
+        //    userVideoExist.append(userVideo);
+        //  }
       });
     });
 
@@ -375,33 +384,33 @@ export class LiveComponent implements OnInit {
     // console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
-    if (!alreadyExist) {
-      const call = this.callService.getPeer()?.call(peerId, myStream);
+    // if (!alreadyExist) {
+    const call = this.callService.getPeer()?.call(peerId, myStream);
 
-      console.log('call: ', call);
+    console.log('call: ', call);
 
-      call?.on('stream', (userVideoStream: any) => {
-        const userVideoExist = document.getElementById(peerId);
-        if (!userVideoExist) {
-          userVideo.id = peerId;
-          this.addVideoStream(userVideo, userVideoStream, username, peerId);
-        } else {
-          console.log('User video already exist');
-          userVideoExist.getElementsByTagName('video')[0].remove();
-          userVideoExist.append(userVideo);
-        }
-        call.on('close', () => {
-          userVideo.remove();
-          // remove the container of the user video
-          document.getElementById(peerId)?.remove();
-        });
+    call?.on('stream', (userVideoStream: any) => {
+      const userVideoExist = document.getElementById(peerId);
+      if (!userVideoExist) {
+        userVideo.id = peerId;
+        this.addVideoStream(userVideo, userVideoStream, username, peerId);
+      } else {
+        console.log('User video already exist');
+        userVideoExist.getElementsByTagName('video')[0].remove();
+        userVideoExist.append(userVideo);
+      }
+      call.on('close', () => {
+        userVideo.remove();
+        // remove the container of the user video
+        document.getElementById(peerId)?.remove();
       });
-      this.peers[peerId] = call;
+    });
+    this.peers[peerId] = call;
 
-      console.log('peers: ', this.peers);
-    } else {
-      console.log('peer already exist');
-    }
+    console.log('peers: ', this.peers);
+    // } else {
+    //   console.log('peer already exist');
+    // }
   }
   endCall(result: boolean) {
     console.log('end call clicked');
