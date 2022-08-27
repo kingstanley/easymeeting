@@ -120,7 +120,10 @@ export class LiveComponent implements OnInit {
             );
           } else {
             console.log('User video already exist');
-            userVideoExist.getElementsByTagName('video')[0].remove();
+            const videos = userVideoExist.getElementsByTagName('video');
+            for (let i = 0; i < videos.length; i++) {
+              videos[i].parentNode?.removeChild(videos[i]);
+            }
             userVideoExist.append(peerVideo);
           }
         }
@@ -403,7 +406,7 @@ export class LiveComponent implements OnInit {
         userVideo.id = peerId;
         this.addVideoStream(userVideo, userVideoStream, username, peerId);
       } else {
-        console.log('User video already exist');
+        console.log('User video already exist 1');
         const videos = userVideoExist.getElementsByTagName('video');
         console.log('videos len: ', videos.length);
 
@@ -414,7 +417,7 @@ export class LiveComponent implements OnInit {
         userVideoExist.append(userVideo);
       }
       call.on('close', () => {
-        userVideo.remove();
+        userVideo?.remove();
         // remove the container of the user video
         document.getElementById(peerId)?.remove();
       });
