@@ -107,7 +107,7 @@ export class LiveComponent implements OnInit {
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
         const user = this.users.find((user) => user.peerId == call.peer);
-        this.addVideoStream(peerVideo, peerStream, '', '');
+        // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
         if (user) {
           if (!userVideoExist) {
@@ -413,8 +413,7 @@ export class LiveComponent implements OnInit {
         for (let i = 0; i < videos.length; i++) {
           videos[i].parentNode?.removeChild(videos[i]);
         }
-
-        userVideoExist.append(userVideo);
+        this.addVideoStream(userVideo, userVideoStream, username, peerId);
       }
       call.on('close', () => {
         userVideo?.remove();
