@@ -404,7 +404,11 @@ export class LiveComponent implements OnInit {
         this.addVideoStream(userVideo, userVideoStream, username, peerId);
       } else {
         console.log('User video already exist');
-        userVideoExist.getElementsByTagName('video')[0].remove();
+        const videos = userVideoExist.getElementsByTagName('video');
+        for (let i = 0; i < videos.length; i++) {
+          videos[i].remove();
+        }
+
         userVideoExist.append(userVideo);
       }
       call.on('close', () => {
