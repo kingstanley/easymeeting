@@ -103,7 +103,7 @@ export class LiveComponent implements OnInit {
     this.callService.getPeer()?.on('call', (call) => {
       call.answer(this.myStream);
       const peerVideo = document.createElement('video');
-
+      console.log('call object: ', call);
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
         this.addVideoStream(peerVideo, peerStream, '', '');
