@@ -135,7 +135,9 @@ export class LiveComponent implements OnInit {
       'user-connected',
       (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
-        this.users.push({ peerId: peerId, socketId, username: username });
+        if (!this.users.find((user) => user.peerId == peerId)) {
+          this.users.push({ peerId: peerId, socketId, username: username });
+        }
         this.connectToNewUser(peerId, this.myStream, username);
       }
     );
@@ -385,6 +387,8 @@ export class LiveComponent implements OnInit {
           this.addVideoStream(userVideo, userVideoStream, username, peerId);
         } else {
           console.log('User video already exist');
+          userVideoExist.getElementsByTagName('video')[0].remove();
+          userVideoExist.append(userVideo);
         }
         call.on('close', () => {
           userVideo.remove();
@@ -395,6 +399,8 @@ export class LiveComponent implements OnInit {
       this.peers[peerId] = call;
 
       console.log('peers: ', this.peers);
+    } else {
+      console.log('peer already exist');
     }
   }
   endCall(result: boolean) {
@@ -402,15 +408,12 @@ export class LiveComponent implements OnInit {
     // this.myStream = null;
     this.socket.disconnect('user-disconnected');
     this.callService.getPeer()?.destroy();
-
     const tracks = this.myStream.getTracks();
-
     tracks.forEach((track: MediaStreamTrack) => {
       console.log('track: ', track);
-
       track.stop();
     });
-    window.location.href = '/meeting/';
+    window.location.href = '/meeting/live/' + this.meeting.code;
   }
   toggleMic(value: boolean) {
     if (value) {
