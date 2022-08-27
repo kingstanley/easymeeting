@@ -452,12 +452,20 @@ export class LiveComponent implements OnInit {
       console.log('media: ', this.myStream.id);
       console.log('toggle video: ', value, this.useVideo);
       await this.getMediaStream();
+      // this.socket.emit();
       console.log('media 1: ', this.myStream.id);
       const newVideo = document.createElement('video');
       newVideo.srcObject = this.myStream;
       newVideo.muted = true;
       newVideo.addEventListener('loadedmetadata', () => newVideo.play());
       videoCon.append(newVideo);
+      this.socket.emit(
+        'join-room',
+        this.ROOM_ID,
+        this.callService.getPeer()?.id,
+        this.username,
+        this.socket.ioSocket.id
+      );
     })();
   }
 }
