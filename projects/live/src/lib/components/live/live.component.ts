@@ -395,6 +395,7 @@ export class LiveComponent implements OnInit {
     // console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
+    userVideo.addEventListener('loadedmetadata', () => userVideo.play());
     // if (!alreadyExist) {
     const call = this.callService.getPeer()?.call(peerId, myStream);
 
@@ -413,7 +414,9 @@ export class LiveComponent implements OnInit {
         for (let i = 0; i < videos.length; i++) {
           videos[i].parentNode?.removeChild(videos[i]);
         }
-        this.addVideoStream(userVideo, userVideoStream, username, peerId);
+        userVideo.srcObject = userVideoStream;
+        userVideoExist.append(userVideo);
+        // this.addVideoStream(userVideo, userVideoStream, username, peerId);
       }
       call.on('close', () => {
         userVideo?.remove();
