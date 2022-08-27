@@ -476,33 +476,35 @@ export class LiveComponent implements OnInit {
     } else {
       this.useVideo = false;
     }
-    (async () => {
-      const videoCon = document.getElementById(
-        this.callService.getPeer()?.id || ''
-      ) as HTMLElement;
-      const myVideo = videoCon.getElementsByTagName('video')[0];
-      myVideo.remove();
+    this.myStream.getVideoTracks()[0].enabled =
+      !this.myStream.getVideoTracks()[0].enabled;
+    // (async () => {
+    const videoCon = document.getElementById(
+      this.callService.getPeer()?.id || ''
+    ) as HTMLElement;
+    const myVideo = videoCon.getElementsByTagName('video')[0];
+    myVideo.remove();
 
-      console.log('async function running');
-      const tracks = this.myStream.getVideoTracks();
-      tracks.forEach((track) => track.stop());
-      console.log('media: ', this.myStream.id);
-      console.log('toggle video: ', value, this.useVideo);
-      await this.getMediaStream();
-      // this.socket.emit();
-      console.log('media 1: ', this.myStream.id);
-      const newVideo = document.createElement('video');
-      newVideo.srcObject = this.myStream;
-      newVideo.muted = true;
-      newVideo.addEventListener('loadedmetadata', () => newVideo.play());
-      videoCon.append(newVideo);
-      this.socket.emit(
-        'join-room',
-        this.ROOM_ID,
-        this.callService.getPeer()?.id,
-        this.username,
-        this.socket.ioSocket.id
-      );
-    })();
+    //   console.log('async function running');
+    //   const tracks = this.myStream.getVideoTracks();
+    //   tracks.forEach((track) => track.stop());
+    //   console.log('media: ', this.myStream.id);
+    //   console.log('toggle video: ', value, this.useVideo);
+    //   await this.getMediaStream();
+    //   // this.socket.emit();
+    //   console.log('media 1: ', this.myStream.id);
+    const newVideo = document.createElement('video');
+    newVideo.srcObject = this.myStream;
+    newVideo.muted = true;
+    newVideo.addEventListener('loadedmetadata', () => newVideo.play());
+    videoCon.append(newVideo);
+    //   this.socket.emit(
+    //     'join-room',
+    //     this.ROOM_ID,
+    //     this.callService.getPeer()?.id,
+    //     this.username,
+    //     this.socket.ioSocket.id
+    //   );
+    // })();
   }
 }
