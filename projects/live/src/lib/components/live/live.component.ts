@@ -131,7 +131,7 @@ export class LiveComponent implements OnInit {
         } else {
           console.log('no user exist yet');
 
-          this.addVideoStream(peerVideo, peerStream, '', '');
+          this.addVideoStream(peerVideo, peerStream, '', call.peer);
         }
       });
     });
