@@ -107,6 +107,8 @@ export class LiveComponent implements OnInit {
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
         const user = this.users.find((user) => user.peerId == call.peer);
+        console.log('found user 1: ', user);
+
         // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
         if (user) {
@@ -126,6 +128,10 @@ export class LiveComponent implements OnInit {
             }
             userVideoExist.append(peerVideo);
           }
+        } else {
+          console.log('no user exist yet');
+
+          this.addVideoStream(peerVideo, peerStream, '', '');
         }
       });
     });
