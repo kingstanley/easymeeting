@@ -370,7 +370,7 @@ export class LiveComponent implements OnInit {
       holder.className = 'item3 position-relative card bg-dark';
     }
     holder.append(video);
-    if (username) {
+    if (!username) {
       console.log('no username');
 
       const user = this.users.find((user) => user.peerId == peerId);
@@ -405,8 +405,10 @@ export class LiveComponent implements OnInit {
       } else {
         console.log('User video already exist');
         const videos = userVideoExist.getElementsByTagName('video');
+        console.log('videos len: ', videos.length);
+
         for (let i = 0; i < videos.length; i++) {
-          videos[i].remove();
+          videos[i].parentNode?.removeChild(videos[i]);
         }
 
         userVideoExist.append(userVideo);
