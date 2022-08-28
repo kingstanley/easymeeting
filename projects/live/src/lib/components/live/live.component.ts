@@ -178,6 +178,8 @@ export class LiveComponent implements OnInit {
       (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
         if (!this.users[peerId]) {
+          console.log('user not yet added to users');
+
           this.users[peerId] = { peerId: peerId, socketId, username: username };
         }
         this.connectToNewUser(peerId, this.myStream, username, socketId);
@@ -287,7 +289,7 @@ export class LiveComponent implements OnInit {
     );
   }
   cancelJoin() {
-    // console.log('cancel join');
+    this.myStream.getVideoTracks()[0].stop();
     this.router.navigate(['/']);
   }
 
@@ -409,6 +411,8 @@ export class LiveComponent implements OnInit {
     console.log('videoGrid: ', videoGrid);
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
+    console.log('');
+
     if (!socketId) {
       socketId = this.users[peerId]?.socketId;
     }
@@ -484,7 +488,7 @@ export class LiveComponent implements OnInit {
     socketId: string
   ) {
     const alreadyExist = this.peers[peerId];
-    // console.log('connecting to peers', peerId, this.peers, alreadyExist);
+    console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
     userVideo.addEventListener('loadedmetadata', () => {
