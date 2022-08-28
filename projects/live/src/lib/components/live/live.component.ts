@@ -23,12 +23,7 @@ export class LiveComponent implements OnInit {
   averageRating = 0;
   isAdmitted = false;
   username = '';
-  users: Array<{
-    peerId: string;
-    username: string;
-    socketId: string;
-    stream?: any;
-  }> = [];
+  users: any;
   constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream = new MediaStream();
@@ -78,6 +73,25 @@ export class LiveComponent implements OnInit {
     this.chatService
       .welcomeMessage()
       .subscribe((message) => console.log('message: ', message));
+
+    // listen to events to control camera and mic from admin
+    this.socket.on('turn-off-cam', (peerId: string, socketId: string) => {
+      console.log('asked to turn off cam: ', peerId, socketId);
+      this.myStream.getVideoTracks()[0].enabled = false;
+    });
+    this.socket.on('turn-on-cam', (peerId: string, socketId: string) => {
+      console.log('asked to turn on cam: ', peerId, socketId);
+      this.myStream.getVideoTracks()[0].enabled = true;
+    });
+    this.socket.on('turn-off-mic', (peerId: string, socketId: string) => {
+      console.log('asked to turn off mic: ', peerId, socketId);
+      this.myStream.getAudioTracks()[0].enabled = false;
+    });
+    this.socket.on('turn-on-mic', (peerId: string, socketId: string) => {
+      console.log('asked to turn on mic: ', peerId, socketId);
+      this.myStream.getAudioTracks()[0].enabled = true;
+    });
+
     console.log('io socket: ', this.chatService.Socket.ioSocket);
     this.chatService.sendMessage('hello', 'Hello server');
 
@@ -106,9 +120,7 @@ export class LiveComponent implements OnInit {
       console.log('call object: ', call);
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
-        const user = this.users.find((user) => user.peerId == call.peer);
-        console.log('found user 1: ', user);
-
+        const user = this.users[call.peer];
         // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
         if (user) {
@@ -118,7 +130,8 @@ export class LiveComponent implements OnInit {
               peerVideo,
               peerStream,
               user?.username,
-              call.peer
+              call.peer,
+              ''
             );
           } else {
             console.log('User video already exist');
@@ -128,10 +141,6 @@ export class LiveComponent implements OnInit {
             }
             userVideoExist.append(peerVideo);
           }
-        } else {
-          console.log('no user exist yet');
-
-          this.addVideoStream(peerVideo, peerStream, '', call.peer);
         }
       });
     });
@@ -144,27 +153,28 @@ export class LiveComponent implements OnInit {
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
       if (this.callService.getPeer()?.id) {
-        this.users.push({
+        this.users[this.callService.getPeer()?.id || this.username] = {
           peerId: this.callService.getPeer()?.id || this.username,
           socketId: this.socket.ioSocket.id,
           username: this.username,
-        });
+        };
       }
       this.addVideoStream(
         myVideo,
         this.myStream,
         'You',
-        this.callService.getPeer()?.id || this.myStream.id
+        this.callService.getPeer()?.id || this.myStream.id,
+        this.socket.ioSocket.id
       );
     }
     this.chatService.Socket.on(
       'user-connected',
       (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
-        if (!this.users.find((user) => user.peerId == peerId)) {
-          this.users.push({ peerId: peerId, socketId, username: username });
+        if (!this.users[peerId]) {
+          this.users[peerId] = { peerId: peerId, socketId, username: username };
         }
-        this.connectToNewUser(peerId, this.myStream, username);
+        this.connectToNewUser(peerId, this.myStream, username, socketId);
       }
     );
     this.socket.on(
@@ -208,7 +218,8 @@ export class LiveComponent implements OnInit {
           myVideo,
           this.myStream,
           'You',
-          this.callService.getPeer()?.id || this.username
+          this.callService.getPeer()?.id || this.username,
+          this.socket.ioSocket.id
         );
         this.socket.emit(
           'join-room',
@@ -265,11 +276,13 @@ export class LiveComponent implements OnInit {
       myVideo,
       this.myStream,
       'You',
-      this.callService.getPeer()?.id || this.myStream.id
+      this.callService.getPeer()?.id || this.myStream.id,
+      this.socket.ioSocket.id
     );
   }
   cancelJoin() {
     console.log('cancel join');
+    this.router.navigate(['/']);
   }
 
   async getMediaStream() {
@@ -338,7 +351,8 @@ export class LiveComponent implements OnInit {
     video: HTMLVideoElement,
     stream: any,
     username: string,
-    peerId: string
+    peerId: string,
+    socketId: string
   ) {
     console.log('users: ', this.users);
 
@@ -382,7 +396,7 @@ export class LiveComponent implements OnInit {
     if (!username) {
       console.log('no username');
 
-      const user = this.users.find((user) => user.peerId == peerId);
+      const user = this.users[peerId];
       console.log('but user found: ', user);
 
       if (user) username = user.username;
@@ -391,17 +405,96 @@ export class LiveComponent implements OnInit {
     const usernameLabl = document.createElement('span');
     usernameLabl.innerText = username;
     usernameLabl.className = 'text-white position-absolute';
-
+    if (this.isAdmin() && stream != this.myStream) {
+      this.addControls(holder, peerId, socketId);
+    }
     holder.prepend(usernameLabl);
+
     videoGrid.prepend(holder);
     console.log('videoGrid: ', videoGrid);
   }
-  connectToNewUser(peerId: any, myStream: any, username: string) {
+  addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
+    if (!socketId) {
+      socketId = this.users[peerId].socketId;
+    }
+    const camButtonOff = document.createElement('button');
+
+    camButtonOff.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video-off" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10.961 12.365a1.99 1.99 0 0 0 .522-1.103l3.11 1.382A1 1 0 0 0 16 11.731V4.269a1 1 0 0 0-1.406-.913l-3.111 1.382A2 2 0 0 0 9.5 3H4.272l.714 1H9.5a1 1 0 0 1 1 1v6a1 1 0 0 1-.144.518l.605.847zM1.428 4.18A.999.999 0 0 0 1 5v6a1 1 0 0 0 1 1h5.014l.714 1H2a2 2 0 0 1-2-2V5c0-.675.334-1.272.847-1.634l.58.814zM15 11.73l-3.5-1.555v-4.35L15 4.269v7.462zm-4.407 3.56-10-14 .814-.58 10 14-.814.58z"/>
+</svg>`;
+    camButtonOff.className = 'm-1 btn btn-dark';
+
+    const camButton = document.createElement('button');
+
+    camButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z"/>
+</svg>`;
+    camButton.className = 'm-1 btn btn-dark';
+    camButton.style.display = 'none';
+    // mic control buttons
+    const micButtonOff = document.createElement('button');
+    micButtonOff.className = 'm-1 btn btn-dark';
+    micButtonOff.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic-mute" viewBox="0 0 16 16">
+  <path d="M13 8c0 .564-.094 1.107-.266 1.613l-.814-.814A4.02 4.02 0 0 0 12 8V7a.5.5 0 0 1 1 0v1zm-5 4c.818 0 1.578-.245 2.212-.667l.718.719a4.973 4.973 0 0 1-2.43.923V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 1 0v1a4 4 0 0 0 4 4zm3-9v4.879l-1-1V3a2 2 0 0 0-3.997-.118l-.845-.845A3.001 3.001 0 0 1 11 3z"/>
+  <path d="m9.486 10.607-.748-.748A2 2 0 0 1 6 8v-.878l-1-1V8a3 3 0 0 0 4.486 2.607zm-7.84-9.253 12 12 .708-.708-12-12-.708.708z"/>
+</svg>`;
+
+    const micButtonOn = document.createElement('button');
+    micButtonOn.className = 'm-1 btn btn-dark';
+    micButtonOn.style.display = 'none';
+    micButtonOn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mic" viewBox="0 0 16 16">
+  <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+  <path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/>
+</svg>`;
+
+    // add button event listeners
+    camButtonOff.addEventListener('click', () => {
+      camButtonOff.style.display = 'none';
+      camButton.style.display = 'block';
+      this.socket.emit('turn-off-cam', peerId, socketId);
+    });
+
+    camButton.addEventListener('click', () => {
+      camButtonOff.style.display = 'block';
+      camButton.style.display = 'none';
+      this.socket.emit('turn-on-cam', peerId, socketId);
+    });
+
+    micButtonOff.addEventListener('click', () => {
+      micButtonOn.style.display = 'block';
+      micButtonOff.style.display = 'none';
+      this.socket.emit('turn-off-mic', peerId, socketId);
+    });
+    micButtonOn.addEventListener('click', () => {
+      micButtonOn.style.display = 'none';
+      micButtonOff.style.display = 'block';
+      this.socket.emit('turn-on-mic', peerId, socketId);
+    });
+
+    // create button container and add buttons
+    const buttonHolders = document.createElement('div');
+    buttonHolders.className = 'position-absolute';
+    buttonHolders.style.top = '0';
+    buttonHolders.style.right = '0';
+    buttonHolders.append(camButtonOff);
+    buttonHolders.append(camButton);
+    buttonHolders.append(micButtonOff);
+    buttonHolders.append(micButtonOn);
+    holder.append(buttonHolders);
+  }
+  connectToNewUser(
+    peerId: any,
+    myStream: any,
+    username: string,
+    socketId: string
+  ) {
     const alreadyExist = this.peers[peerId];
     // console.log('connecting to peers', peerId, this.peers, alreadyExist);
 
     const userVideo = document.createElement('video');
-    userVideo.addEventListener('loadedmetadata', () => userVideo.play());
+    userVideo.addEventListener('loadedmetadata', () => {
+      userVideo.play();
+    });
     // if (!alreadyExist) {
     const call = this.callService.getPeer()?.call(peerId, myStream);
 
@@ -411,7 +504,13 @@ export class LiveComponent implements OnInit {
       const userVideoExist = document.getElementById(peerId);
       if (!userVideoExist) {
         userVideo.id = peerId;
-        this.addVideoStream(userVideo, userVideoStream, username, peerId);
+        this.addVideoStream(
+          userVideo,
+          userVideoStream,
+          username,
+          peerId,
+          socketId
+        );
       } else {
         console.log('User video already exist 1');
         const videos = userVideoExist.getElementsByTagName('video');
@@ -450,73 +549,11 @@ export class LiveComponent implements OnInit {
     window.location.href = '/meeting/live/' + this.meeting.code;
   }
   toggleMic(value: boolean) {
-    const audioTrack = this.myStream
-      .getTracks()
-      .find((track) => track.kind == 'audio');
-    if (audioTrack) {
-      console.log('audio track: ', audioTrack);
-
-      audioTrack.enabled = !audioTrack?.enabled;
-    }
+    const audioTrack = this.myStream.getAudioTracks();
+    audioTrack[0].enabled = !value;
   }
   toggleCam(value: boolean) {
-    this.useVideo = !this.useVideo;
-    if (!value) {
-      this.useVideo = {
-        width: {
-          min: this.constrainWidth.min,
-          ideal: this.constrainWidth.ideal,
-          max: this.constrainWidth.max,
-        },
-        // height: {
-        //   min: this.constrainHeight.min,
-        //   ideal: this.constrainHeight.ideal,
-        //   max: this.constrainHeight.max,
-        // },
-        facingMode: 'user',
-      };
-    } else {
-      this.useVideo = false;
-    }
-    const videoTrack = this.myStream
-      .getTracks()
-      .find((track) => track.kind == 'video');
-    if (videoTrack) {
-      console.log('video track: ', videoTrack);
-
-      videoTrack.enabled = !videoTrack?.enabled;
-    }
-    // const videoCon = document.getElementById(
-    //   this.callService.getPeer()?.id || ''
-    // ) as HTMLElement;
-    // const myVideo = videoCon.getElementsByTagName('video')[0];
-    // myVideo.remove();
-
-    //   console.log('async function running');
-    //   const tracks = this.myStream.getVideoTracks();
-    //   tracks.forEach((track) => track.stop());
-    //   console.log('media: ', this.myStream.id);
-    //   console.log('toggle video: ', value, this.useVideo);
-    //   await this.getMediaStream();
-    //   // this.socket.emit();
-    //   console.log('media 1: ', this.myStream.id);
-    // const newVideo = document.createElement('video');
-    // newVideo.srcObject = this.myStream;
-    // newVideo.muted = true;
-    // newVideo.addEventListener('loadedmetadata', () => newVideo.play());
-    // videoCon.append(newVideo);
-    //   this.socket.emit(
-    //     'join-room',
-    //     this.ROOM_ID,
-    //     this.callService.getPeer()?.id,
-    //     this.username,
-    //     this.socket.ioSocket.id
-    //   );
-    // })();
-  }
-  ngDestroy() {
-    this.myStream.getTracks().forEach((track) => {
-      track.stop();
-    });
+    const videoTrack = this.myStream.getVideoTracks();
+    videoTrack[0].enabled = !value;
   }
 }
