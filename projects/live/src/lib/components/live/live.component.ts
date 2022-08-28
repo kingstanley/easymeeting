@@ -23,7 +23,7 @@ export class LiveComponent implements OnInit {
   averageRating = 0;
   isAdmitted = false;
   username = '';
-  users: any;
+  users: any = {};
   constrainWidth = { min: 250, ideal: 800, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream = new MediaStream();
