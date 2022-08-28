@@ -287,7 +287,7 @@ export class LiveComponent implements OnInit {
     );
   }
   cancelJoin() {
-    console.log('cancel join');
+    // console.log('cancel join');
     this.router.navigate(['/']);
   }
 
@@ -341,18 +341,7 @@ export class LiveComponent implements OnInit {
       container.style.gridAutoRows = '200px ';
     }
   }
-  addPreview(video: HTMLVideoElement, stream: any) {
-    const videoGrid: HTMLDivElement = document.querySelector(
-      '.preview'
-    ) as HTMLDivElement;
-    video.srcObject = stream;
-    // video.autoplay;
-    //   console.log("My stream: ", stream);
-    video.addEventListener('loadedmetadata', () => {
-      video.play();
-    });
-    videoGrid.append(video);
-  }
+
   addVideoStream(
     video: HTMLVideoElement,
     stream: any,
@@ -421,7 +410,7 @@ export class LiveComponent implements OnInit {
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
     if (!socketId) {
-      socketId = this.users[peerId].socketId;
+      socketId = this.users[peerId]?.socketId;
     }
     const camButtonOff = document.createElement('button');
 
