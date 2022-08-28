@@ -121,6 +121,7 @@ export class LiveComponent implements OnInit {
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
         const user = this.users[call.peer];
+
         // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
         if (user) {
@@ -141,6 +142,8 @@ export class LiveComponent implements OnInit {
             }
             userVideoExist.append(peerVideo);
           }
+        } else {
+          console.log('user not found');
         }
       });
     });
@@ -152,13 +155,16 @@ export class LiveComponent implements OnInit {
 
     if (this.myStream) {
       console.log('my stream is ', this.myStream);
-      if (this.callService.getPeer()?.id) {
-        this.users[this.callService.getPeer()?.id || this.username] = {
+      this.callService.getPeer()?.on('open', (id) => {
+        console.log('peerId on open: ', id);
+
+        this.users[id] = {
           peerId: this.callService.getPeer()?.id || this.username,
           socketId: this.socket.ioSocket.id,
           username: this.username,
         };
-      }
+      });
+
       this.addVideoStream(
         myVideo,
         this.myStream,
@@ -369,29 +375,29 @@ export class LiveComponent implements OnInit {
     });
     const holder = document.createElement('div');
     holder.id = peerId;
-    if (this.users.length <= 1) {
-      this.constrainWidth.ideal = 500;
-      holder.className = 'item position-relative card bg-dark';
-      // (async () => {
-      //   await this.getMediaStream();
-      //   console.log('new stream with ideal 500: ', this.myStream);
-      // })();
-    } else {
-      this.constrainWidth.ideal = 400;
-      // (async () => {
-      //   await this.getMediaStream();
-      //   console.log('new stream with ideal 400: ', this.myStream);
-      // })();
-    }
-    if (this.users.length <= 5 && this.users.length > 2) {
-      holder.className = 'item1 position-relative card bg-dark';
-    }
-    if (this.users.length <= 10 && this.users.length > 5) {
-      holder.className = 'item2 position-relative card bg-dark';
-    }
-    if (this.users.length > 10) {
-      holder.className = 'item3 position-relative card bg-dark';
-    }
+    // if (this.users.length <= 1) {
+    //   this.constrainWidth.ideal = 500;
+    //   holder.className = 'item position-relative card bg-dark';
+    // (async () => {
+    //   await this.getMediaStream();
+    //   console.log('new stream with ideal 500: ', this.myStream);
+    // })();
+    // } else {
+    //   this.constrainWidth.ideal = 400;
+    // (async () => {
+    //   await this.getMediaStream();
+    //   console.log('new stream with ideal 400: ', this.myStream);
+    // })();
+    // }
+    // if (this.users.length <= 5 && this.users.length > 2) {
+    //   holder.className = 'item1 position-relative card bg-dark';
+    // }
+    // if (this.users.length <= 10 && this.users.length > 5) {
+    //   holder.className = 'item2 position-relative card bg-dark';
+    // }
+    // if (this.users.length > 10) {
+    //   holder.className = 'item3 position-relative card bg-dark';
+    // }
     holder.append(video);
     if (!username) {
       console.log('no username');
