@@ -124,7 +124,7 @@ export class LiveComponent implements OnInit {
 
         // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
-        if (user) {
+        if (!user) {
           this.users[call.peer] = {
             peerId: call.peer,
             socketId: null,
@@ -152,6 +152,8 @@ export class LiveComponent implements OnInit {
       });
     });
     this.socket.on('request-details', (peerId: string) => {
+      console.log('requesting details for ', peerId);
+
       if (this.callService.getPeer()?.id == peerId) {
         this.socket.emit(
           'sent-details',
@@ -164,6 +166,8 @@ export class LiveComponent implements OnInit {
     this.socket.on(
       'sent-details',
       (peerId: string, socketId: string, username: string) => {
+        console.log('received details: ', peerId, socketId, username);
+
         this.users[peerId] = { peerId, socketId, username };
       }
     );
