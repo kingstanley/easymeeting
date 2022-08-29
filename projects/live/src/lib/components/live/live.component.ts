@@ -117,6 +117,7 @@ export class LiveComponent implements OnInit {
     this.callService.getPeer()?.on('call', (call) => {
       call.answer(this.myStream);
       const peerVideo = document.createElement('video');
+
       console.log('call object: ', call);
       call.on('stream', (peerStream) => {
         console.log('user received call stream: ', peerStream);
@@ -124,11 +125,11 @@ export class LiveComponent implements OnInit {
 
         // this.addVideoStream(peerVideo, peerStream, '', '');
         if (!user) {
-          this.users[call.peer] = {
-            peerId: call.peer,
-            socketId: null,
-            username: null,
-          };
+          // this.users[call.peer] = {
+          //   peerId: call.peer,
+          //   socketId: null,
+          //   username: null,
+          // };
           this.socket.emit('request-details', call.peer);
           this.socket.on(
             'sent-details',
@@ -162,7 +163,14 @@ export class LiveComponent implements OnInit {
         //   ''
         // );
       });
+      call.on('close', () => {
+        peerVideo?.remove();
+        // remove the container of the user video
+        document.getElementById(call.peer)?.remove();
+      });
+      this.peers[call.peer] = call;
     });
+
     this.socket.on('request-details', (peerId: string) => {
       console.log('requesting details for ', peerId);
 
@@ -385,7 +393,14 @@ export class LiveComponent implements OnInit {
     peerId: string,
     socketId: string
   ) {
-    console.log('users: ', this.users);
+    console.log(
+      'users: ',
+      this.users,
+      'username: ',
+      username,
+      'peerId: ',
+      peerId
+    );
 
     // this.resizeGrid();
     const videoGrid: HTMLDivElement = document.querySelector(
@@ -413,25 +428,28 @@ export class LiveComponent implements OnInit {
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
     usernameLabl.innerText = username;
+    usernameLabl.id = `${peerId}-${username}`;
     usernameLabl.className = 'text-white position-absolute m-2';
 
     const userVideoExist = document.getElementById(peerId) as HTMLDivElement;
     if (!userVideoExist) {
       holder.id = peerId;
+      holder.prepend(usernameLabl);
       holder.append(video);
       videoGrid.prepend(holder);
       if (this.isAdmin() && stream != this.myStream) {
         this.addControls(holder, peerId, socketId);
       }
-      holder.prepend(usernameLabl);
     } else {
       console.log('User video already exist');
       const videos = userVideoExist.getElementsByTagName('video');
       for (let i = 0; i < videos.length; i++) {
         videos[i].parentNode?.removeChild(videos[i]);
       }
+      document.getElementById(`${peerId}-${username}`)?.remove();
       document.getElementById(`${peerId}-actions`)?.remove();
       userVideoExist.append(video);
+      userVideoExist.prepend(usernameLabl);
       if (this.isAdmin() && stream != this.myStream) {
         this.addControls(userVideoExist, peerId, socketId);
       }

@@ -2,7 +2,8 @@
    .ask-screen {
      display: flex;
      flex-direction: row;
-     overflow: hidden;
+     //  overflow-x: hidden;
+     //  overflow-y: scroll;
      gap: 5px;
      flex-wrap: wrap;
      height: 100vh;
@@ -43,10 +44,15 @@
    main {
      //  justify-content: center;
      //  align-items: center;
+     display: flex;
      text-align: center;
      background-color: rgb(69, 60, 60);
      width: 100vw;
      min-height: 100vh;
+     justify-content: center;
+     align-items: center;
+     gap: 10px;
+     color: white;
 
    }
 

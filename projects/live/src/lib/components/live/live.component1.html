@@ -1,22 +1,22 @@
-<main style="overflow-y: scroll" id="main">
-  <div class="ask-screen ">
-    <div class="content">
-
-    </div>
-    <div class="action" id="action">
-      <mat-form-field appearance="outline">
-        <input matInput [(ngModel)]="username" placeholder="Name or organization">
-      </mat-form-field>
-      <div class="buttons">
-        <button *ngIf="!isAdmin()" [disabled]="!showButtons" mat-raised-button (click)="askToJoin()" color="primary">Ask
-          to
-          Join</button>
-        <button *ngIf="isAdmin() " [disabled]="!showButtons" mat-raised-button (click)="joinAsAdmin()"
-          color="primary">Join</button>
-        <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
-      </div>
+<main style="overflow-y: scroll;" id="main">
+  <!-- <div class="ask-screen "> -->
+  <div class="content">
+    <!-- <img src="assets/call2.jpg" /> -->
+  </div>
+  <div class="action" id="action">
+    <mat-form-field appearance="outline">
+      <input matInput [(ngModel)]="username" placeholder="Name or organization">
+    </mat-form-field>
+    <div class="buttons">
+      <button *ngIf="!isAdmin()" [disabled]="!showButtons" mat-raised-button (click)="askToJoin()" color="primary">Ask
+        to
+        Join</button>
+      <button *ngIf="isAdmin() " [disabled]="!showButtons" mat-raised-button (click)="joinAsAdmin()"
+        color="primary">Join</button>
+      <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
     </div>
   </div>
+  <!-- </div> -->
 
 </main>
 <app-actions (emitMicToggle)="toggleMic($event)" (emitCamToggle)="toggleCam($event)" (emitEndCall)="endCall($event)"
