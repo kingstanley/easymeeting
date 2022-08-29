@@ -213,11 +213,11 @@ export class LiveComponent implements OnInit {
         this.socket.ioSocket.id
       );
     }
-    // this.users[this.callService.getPeer()?.id || this.username] = {
-    //   peerId: this.callService.getPeer()?.id || this.username,
-    //   socketId: this.socket.ioSocket.id,
-    //   username: this.username,
-    // };
+    this.users[this.callService.getPeer()?.id || this.username] = {
+      peerId: this.callService.getPeer()?.id || this.username,
+      socketId: this.socket.ioSocket.id,
+      username: this.username,
+    };
     this.chatService.Socket.on(
       'user-connected',
       (peerId: string, username: string, socketId: string) => {
@@ -317,6 +317,20 @@ export class LiveComponent implements OnInit {
     this.isAdmitted = true;
     const action = document.getElementById('action') as HTMLDivElement;
     action.style.display = 'none';
+    this.constrainWidth.ideal = 400;
+    this.myStream.getVideoTracks()[0].getConstraints().width = 400;
+    console.log(
+      'aspectRatio: ',
+      this.myStream.getVideoTracks()[0].getConstraints().aspectRatio
+    );
+    console.log(
+      'width: ',
+      this.myStream.getVideoTracks()[0].getConstraints().width
+    );
+    console.log(
+      'heigth: ',
+      this.myStream.getVideoTracks()[0].getConstraints().height
+    );
     this.socket.emit(
       'join-room',
       this.ROOM_ID,
@@ -342,36 +356,55 @@ export class LiveComponent implements OnInit {
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-      video: true,
+      video: {
+        width: {
+          min: this.constrainWidth.min,
+          ideal: this.constrainWidth.ideal,
+          max: this.constrainWidth.max,
+        },
+        facingMode: 'user',
+        aspectRatio: 16 / 9,
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleSize: 100,
+      },
     });
   }
-  resizeGrid() {
+  resizeContainer() {
     const container = document.querySelector('.content') as HTMLDivElement;
     console.log('resing : ', container);
+    const userKeys = Object.keys(this.users);
+    console.log('user keys: ', userKeys);
 
-    if (this.users.length < 5) {
-      container.style.gridTemplateColumns = '1fr 1fr';
-      container.style.gridAutoRows = '350px ';
-    }
-    if (this.users.length == 1) {
-      container.style.gridTemplateColumns = '1fr';
-      container.style.gridAutoRows = '600px ';
-    }
-    if (this.users.length < 10 && this.users.length >= 5) {
-      container.style.gridTemplateColumns = '1fr 1fr 1fr';
-      container.style.gridAutoRows = '350px ';
-    }
-    if (this.users.length < 15 && this.users.length >= 10) {
-      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
-      container.style.gridAutoRows = '200px ';
-    }
-    if (this.users.length < 20 && this.users.length >= 15) {
-      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr';
-      container.style.gridAutoRows = '200px ';
-    }
-    if (this.users.length >= 20) {
-      container.style.gridTemplateColumns = '1fr 1fr 1fr 1fr 1fr 1fr';
-      container.style.gridAutoRows = '200px ';
+    const usersLen = userKeys.length;
+    for (let i = 0; i < usersLen; i++) {
+      const card = document.getElementById(userKeys[i]) as HTMLDivElement;
+
+      if (usersLen < 5) {
+        card.style.maxWidth = '500px';
+
+        // container.style.gridAutoRows = '350px ';
+      }
+      if (usersLen == 1) {
+        card.style.maxWidth = '800px';
+        // container.style.gridAutoRows = '800px ';
+      }
+      if (usersLen < 10 && usersLen >= 5) {
+        card.style.maxWidth = '400px';
+        // container.style.gridAutoRows = '350px ';
+      }
+      if (usersLen < 15 && usersLen >= 10) {
+        card.style.maxWidth = '350px';
+        // container.style.gridAutoRows = '200px ';
+      }
+      if (usersLen < 20 && usersLen >= 15) {
+        card.style.maxWidth = '300px';
+        // container.style.gridAutoRows = '200px ';
+      }
+      if (this.users.length >= 20) {
+        card.style.maxWidth = '250px';
+        // container.style.gridAutoRows = '200px ';
+      }
     }
   }
 
@@ -404,8 +437,9 @@ export class LiveComponent implements OnInit {
     });
     const holder = document.createElement('div');
     holder.className = 'card position-relative';
+    // holder.style.maxWidth = '500px';
     // check if user already added to screen. If added replace video stream
-
+    // this.resizeContainer();
     if (!username) {
       console.log('no username');
 
@@ -442,8 +476,8 @@ export class LiveComponent implements OnInit {
       if (this.isAdmin() && stream != this.myStream) {
         this.addControls(userVideoExist, peerId, socketId);
       }
-      //  holder.prepend(usernameLabl);
     }
+    this.resizeContainer();
     console.log('videoGrid: ', videoGrid);
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
