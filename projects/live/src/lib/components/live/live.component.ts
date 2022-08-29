@@ -125,29 +125,48 @@ export class LiveComponent implements OnInit {
         // this.addVideoStream(peerVideo, peerStream, '', '');
         const userVideoExist = document.getElementById(call.peer);
         if (user) {
-          if (!userVideoExist) {
-            peerVideo.id = call.peer;
-            this.addVideoStream(
-              peerVideo,
-              peerStream,
-              user?.username,
-              call.peer,
-              ''
-            );
-          } else {
-            console.log('User video already exist');
-            const videos = userVideoExist.getElementsByTagName('video');
-            for (let i = 0; i < videos.length; i++) {
-              videos[i].parentNode?.removeChild(videos[i]);
-            }
-            userVideoExist.append(peerVideo);
-          }
+          this.users[call.peer] = {
+            peerId: call.peer,
+            socketId: null,
+            username: null,
+          };
+          this.socket.emit('request-details', call.peer);
+        }
+        if (!userVideoExist) {
+          peerVideo.id = call.peer;
+          this.addVideoStream(
+            peerVideo,
+            peerStream,
+            user?.username,
+            call.peer,
+            ''
+          );
         } else {
-          console.log('user not found');
+          console.log('User video already exist');
+          const videos = userVideoExist.getElementsByTagName('video');
+          for (let i = 0; i < videos.length; i++) {
+            videos[i].parentNode?.removeChild(videos[i]);
+          }
+          userVideoExist.append(peerVideo);
         }
       });
     });
-
+    this.socket.on('request-details', (peerId: string) => {
+      if (this.callService.getPeer()?.id == peerId) {
+        this.socket.emit(
+          'sent-details',
+          peerId,
+          this.socket.ioSocket.id,
+          this.username
+        );
+      }
+    });
+    this.socket.on(
+      'sent-details',
+      (peerId: string, socketId: string, username: string) => {
+        this.users[peerId] = { peerId, socketId, username };
+      }
+    );
     const myVideo = document.createElement('video');
     myVideo.muted = true;
 
@@ -159,7 +178,7 @@ export class LiveComponent implements OnInit {
         console.log('peerId on open: ', id);
 
         this.users[id] = {
-          peerId: this.callService.getPeer()?.id || this.username,
+          peerId: id,
           socketId: this.socket.ioSocket.id,
           username: this.username,
         };
@@ -173,11 +192,16 @@ export class LiveComponent implements OnInit {
         this.socket.ioSocket.id
       );
     }
+    // this.users[this.callService.getPeer()?.id || this.username] = {
+    //   peerId: this.callService.getPeer()?.id || this.username,
+    //   socketId: this.socket.ioSocket.id,
+    //   username: this.username,
+    // };
     this.chatService.Socket.on(
       'user-connected',
       (peerId: string, username: string, socketId: string) => {
         console.log('new user peerId: ', peerId);
-        if (!this.users[peerId]) {
+        if (!this.users || !this.users[peerId]) {
           console.log('user not yet added to users');
 
           this.users[peerId] = { peerId: peerId, socketId, username: username };
@@ -207,6 +231,7 @@ export class LiveComponent implements OnInit {
       console.log('disconnected userId: ', peerId);
       if (this.peers[peerId]) {
         this.peers[peerId].close();
+        delete this.users[peerId];
         // remove the div container holding the details of the exiting user
       }
     });
