@@ -145,6 +145,14 @@ export class LiveComponent implements OnInit {
               );
             }
           );
+        } else {
+          this.addVideoStream(
+            peerVideo,
+            peerStream,
+            user.username,
+            call.peer,
+            user.socketId
+          );
         }
         // this.addVideoStream(
         //   peerVideo,
@@ -393,20 +401,6 @@ export class LiveComponent implements OnInit {
     const holder = document.createElement('div');
     holder.className = 'card item position-relative';
     // check if user already added to screen. If added replace video stream
-    const userVideoExist = document.getElementById(peerId);
-    if (!userVideoExist) {
-      holder.id = peerId;
-
-      holder.append(video);
-    } else {
-      console.log('User video already exist');
-      const videos = userVideoExist.getElementsByTagName('video');
-      for (let i = 0; i < videos.length; i++) {
-        videos[i].parentNode?.removeChild(videos[i]);
-      }
-      document.getElementById(`${peerId}-actions`)?.remove();
-      userVideoExist.append(video);
-    }
 
     if (!username) {
       console.log('no username');
@@ -419,13 +413,30 @@ export class LiveComponent implements OnInit {
     // create container for username and acitons
     const usernameLabl = document.createElement('span');
     usernameLabl.innerText = username;
-    usernameLabl.className = 'text-white position-absolute';
-    if (this.isAdmin() && stream != this.myStream) {
-      this.addControls(holder, peerId, socketId);
-    }
-    holder.prepend(usernameLabl);
+    usernameLabl.className = 'text-white position-absolute m-2';
 
-    videoGrid.prepend(holder);
+    const userVideoExist = document.getElementById(peerId) as HTMLDivElement;
+    if (!userVideoExist) {
+      holder.id = peerId;
+      holder.append(video);
+      videoGrid.prepend(holder);
+      if (this.isAdmin() && stream != this.myStream) {
+        this.addControls(holder, peerId, socketId);
+      }
+      holder.prepend(usernameLabl);
+    } else {
+      console.log('User video already exist');
+      const videos = userVideoExist.getElementsByTagName('video');
+      for (let i = 0; i < videos.length; i++) {
+        videos[i].parentNode?.removeChild(videos[i]);
+      }
+      document.getElementById(`${peerId}-actions`)?.remove();
+      userVideoExist.append(video);
+      if (this.isAdmin() && stream != this.myStream) {
+        this.addControls(userVideoExist, peerId, socketId);
+      }
+      //  holder.prepend(usernameLabl);
+    }
     console.log('videoGrid: ', videoGrid);
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
