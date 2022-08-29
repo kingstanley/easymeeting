@@ -17,6 +17,10 @@ import { AdmitComponent } from '../admit/admit.component';
   styleUrls: ['./live.component1.scss'],
 })
 export class LiveComponent implements OnInit {
+  cardStyle = ` min-width: 100px;
+     max-width: 200px;
+     max-height: 150px;
+     flex: 1;`;
   peers = Object.assign({});
   streams: Array<any> = [];
   ROOM_ID = '';
@@ -76,19 +80,19 @@ export class LiveComponent implements OnInit {
 
     // listen to events to control camera and mic from admin
     this.socket.on('turn-off-cam', (peerId: string, socketId: string) => {
-      console.log('asked to turn off cam: ', peerId, socketId);
+      // console.log('asked to turn off cam: ', peerId, socketId);
       this.myStream.getVideoTracks()[0].enabled = false;
     });
     this.socket.on('turn-on-cam', (peerId: string, socketId: string) => {
-      console.log('asked to turn on cam: ', peerId, socketId);
+      // console.log('asked to turn on cam: ', peerId, socketId);
       this.myStream.getVideoTracks()[0].enabled = true;
     });
     this.socket.on('turn-off-mic', (peerId: string, socketId: string) => {
-      console.log('asked to turn off mic: ', peerId, socketId);
+      // console.log('asked to turn off mic: ', peerId, socketId);
       this.myStream.getAudioTracks()[0].enabled = false;
     });
     this.socket.on('turn-on-mic', (peerId: string, socketId: string) => {
-      console.log('asked to turn on mic: ', peerId, socketId);
+      // console.log('asked to turn on mic: ', peerId, socketId);
       this.myStream.getAudioTracks()[0].enabled = true;
     });
 
@@ -337,23 +341,8 @@ export class LiveComponent implements OnInit {
 
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
-      audio: this.useAudio,
-      video:
-        this.useVideo == false
-          ? this.useVideo
-          : {
-              width: {
-                min: this.constrainWidth.min,
-                ideal: this.constrainWidth.ideal,
-                max: this.constrainWidth.max,
-              },
-              // height: {
-              //   min: this.constrainHeight.min,
-              //   ideal: this.constrainHeight.ideal,
-              //   max: this.constrainHeight.max,
-              // },
-              facingMode: 'user',
-            },
+      audio: true,
+      video: true,
     });
   }
   resizeGrid() {
@@ -414,7 +403,7 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = 'card item position-relative';
+    holder.className = 'card position-relative';
     // check if user already added to screen. If added replace video stream
 
     if (!username) {
