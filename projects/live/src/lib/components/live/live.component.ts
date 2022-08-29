@@ -123,7 +123,6 @@ export class LiveComponent implements OnInit {
         const user = this.users[call.peer];
 
         // this.addVideoStream(peerVideo, peerStream, '', '');
-        const userVideoExist = document.getElementById(call.peer);
         if (!user) {
           this.users[call.peer] = {
             peerId: call.peer,
@@ -131,24 +130,29 @@ export class LiveComponent implements OnInit {
             username: null,
           };
           this.socket.emit('request-details', call.peer);
-        }
-        if (!userVideoExist) {
-          peerVideo.id = call.peer;
-          this.addVideoStream(
-            peerVideo,
-            peerStream,
-            user?.username,
-            call.peer,
-            ''
+          this.socket.on(
+            'sent-details',
+            (peerId: string, socketId: string, username: string) => {
+              console.log('received details: ', peerId, socketId, username);
+
+              this.users[peerId] = { peerId, socketId, username };
+              this.addVideoStream(
+                peerVideo,
+                peerStream,
+                username,
+                call.peer,
+                socketId
+              );
+            }
           );
-        } else {
-          console.log('User video already exist');
-          const videos = userVideoExist.getElementsByTagName('video');
-          for (let i = 0; i < videos.length; i++) {
-            videos[i].parentNode?.removeChild(videos[i]);
-          }
-          userVideoExist.append(peerVideo);
         }
+        // this.addVideoStream(
+        //   peerVideo,
+        //   peerStream,
+        //   user?.username,
+        //   call.peer,
+        //   ''
+        // );
       });
     });
     this.socket.on('request-details', (peerId: string) => {
@@ -163,14 +167,7 @@ export class LiveComponent implements OnInit {
         );
       }
     });
-    this.socket.on(
-      'sent-details',
-      (peerId: string, socketId: string, username: string) => {
-        console.log('received details: ', peerId, socketId, username);
 
-        this.users[peerId] = { peerId, socketId, username };
-      }
-    );
     const myVideo = document.createElement('video');
     myVideo.muted = true;
 
@@ -394,36 +391,27 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.id = peerId;
-    // if (this.users.length <= 1) {
-    //   this.constrainWidth.ideal = 500;
-    //   holder.className = 'item position-relative card bg-dark';
-    // (async () => {
-    //   await this.getMediaStream();
-    //   console.log('new stream with ideal 500: ', this.myStream);
-    // })();
-    // } else {
-    //   this.constrainWidth.ideal = 400;
-    // (async () => {
-    //   await this.getMediaStream();
-    //   console.log('new stream with ideal 400: ', this.myStream);
-    // })();
-    // }
-    // if (this.users.length <= 5 && this.users.length > 2) {
-    //   holder.className = 'item1 position-relative card bg-dark';
-    // }
-    // if (this.users.length <= 10 && this.users.length > 5) {
-    //   holder.className = 'item2 position-relative card bg-dark';
-    // }
-    // if (this.users.length > 10) {
-    //   holder.className = 'item3 position-relative card bg-dark';
-    // }
-    holder.append(video);
+    holder.className = 'card item position-relative';
+    // check if user already added to screen. If added replace video stream
+    const userVideoExist = document.getElementById(peerId);
+    if (!userVideoExist) {
+      holder.id = peerId;
+
+      holder.append(video);
+    } else {
+      console.log('User video already exist');
+      const videos = userVideoExist.getElementsByTagName('video');
+      for (let i = 0; i < videos.length; i++) {
+        videos[i].parentNode?.removeChild(videos[i]);
+      }
+      userVideoExist.append(video);
+    }
+
     if (!username) {
       console.log('no username');
 
       const user = this.users[peerId];
-      console.log('but user found: ', user);
+      console.log('user found: ', user);
 
       if (user) username = user.username;
     }
@@ -529,28 +517,27 @@ export class LiveComponent implements OnInit {
     console.log('call: ', call);
 
     call?.on('stream', (userVideoStream: any) => {
-      const userVideoExist = document.getElementById(peerId);
-      if (!userVideoExist) {
-        userVideo.id = peerId;
-        this.addVideoStream(
-          userVideo,
-          userVideoStream,
-          username,
-          peerId,
-          socketId
-        );
-      } else {
-        console.log('User video already exist 1');
-        const videos = userVideoExist.getElementsByTagName('video');
-        console.log('videos len: ', videos.length);
+      // const userVideoExist = document.getElementById(peerId);
+      // if (!userVideoExist) {
+      //   userVideo.id = peerId;
+      this.addVideoStream(
+        userVideo,
+        userVideoStream,
+        username,
+        peerId,
+        socketId
+      );
+      // } else {
+      //   console.log('User video already exist 1');
+      //   const videos = userVideoExist.getElementsByTagName('video');
+      //   console.log('videos len: ', videos.length);
 
-        for (let i = 0; i < videos.length; i++) {
-          videos[i].parentNode?.removeChild(videos[i]);
-        }
-        userVideo.srcObject = userVideoStream;
-        userVideoExist.append(userVideo);
-        // this.addVideoStream(userVideo, userVideoStream, username, peerId);
-      }
+      //   for (let i = 0; i < videos.length; i++) {
+      //     videos[i].parentNode?.removeChild(videos[i]);
+      //   }
+      //   userVideo.srcObject = userVideoStream;
+      //   userVideoExist.append(userVideo);
+      // }
       call.on('close', () => {
         userVideo?.remove();
         // remove the container of the user video
