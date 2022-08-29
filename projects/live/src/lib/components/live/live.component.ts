@@ -404,6 +404,7 @@ export class LiveComponent implements OnInit {
       for (let i = 0; i < videos.length; i++) {
         videos[i].parentNode?.removeChild(videos[i]);
       }
+      document.getElementById(`${peerId}-actions`)?.remove();
       userVideoExist.append(video);
     }
 
@@ -489,6 +490,7 @@ export class LiveComponent implements OnInit {
 
     // create button container and add buttons
     const buttonHolders = document.createElement('div');
+    buttonHolders.id = `${peerId}-actions`;
     buttonHolders.className = 'position-absolute';
     buttonHolders.style.top = '0';
     buttonHolders.style.right = '0';
