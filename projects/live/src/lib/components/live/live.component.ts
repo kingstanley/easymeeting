@@ -392,12 +392,12 @@ export class LiveComponent implements OnInit {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
 
       if (usersLen == 1) {
-        card.style.maxWidth = '98%';
+        card.style.maxWidth = '100%';
       } else if (usersLen == 2) {
         container.className = 'content position-relative';
-        container.style.maxWidth = '100%';
+        // container.style.maxWidth = '100%';
         if (userKeys[i] !== this.callService.getPeer()?.id) {
-          card.style.maxWidth = '98%';
+          card.style.maxWidth = '100%';
         } else {
           card.style.maxWidth = '200px';
           card.style.bottom = '0';
@@ -405,7 +405,11 @@ export class LiveComponent implements OnInit {
           card.className = 'card position-absolute';
         }
       } else if (usersLen < 5 && usersLen > 2) {
-        card.style.maxWidth = '500px';
+        if (userKeys[i] == this.callService.getPeer()?.id) {
+          card.style.maxWidth = '600px';
+          card.style.bottom = '';
+          card.style.right = '';
+        } else card.style.maxWidth = '600px';
       } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
         // container.style.gridAutoRows = '350px ';
