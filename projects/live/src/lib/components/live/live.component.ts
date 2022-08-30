@@ -65,11 +65,11 @@ export class LiveComponent implements OnInit {
     setTimeout(() => {
       this.showButtons = true;
     }, 3000);
-    this.users['test-video'] = {
-      peerId: 'test-video',
-      socketId: '3233-sdsdis',
-      username: 'Test User',
-    };
+    // this.users['test-video'] = {
+    //   peerId: 'test-video',
+    //   socketId: '3233-sdsdis',
+    //   username: 'Test User',
+    // };
   }
 
   async ngOnInit() {
