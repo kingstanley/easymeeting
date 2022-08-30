@@ -176,6 +176,7 @@ export class LiveComponent implements OnInit {
         peerVideo?.remove();
         // remove the container of the user video
         document.getElementById(call.peer)?.remove();
+        this.resizeContainer();
       });
       this.peers[call.peer] = call;
     });
@@ -259,6 +260,8 @@ export class LiveComponent implements OnInit {
         this.peers[peerId].close();
         delete this.users[peerId];
         // remove the div container holding the details of the exiting user
+        document.getElementById(peerId)?.remove();
+        this.resizeContainer();
       }
     });
 
@@ -411,7 +414,7 @@ export class LiveComponent implements OnInit {
           card.style.bottom = '';
           card.style.right = '';
           card.className = 'card';
-        } else card.style.maxWidth = '600px';
+        } else card.style.maxWidth = '500px';
       } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
         // container.style.gridAutoRows = '350px ';
@@ -616,6 +619,7 @@ export class LiveComponent implements OnInit {
         userVideo?.remove();
         // remove the container of the user video
         document.getElementById(peerId)?.remove();
+        this.resizeContainer();
       });
     });
     this.peers[peerId] = call;
