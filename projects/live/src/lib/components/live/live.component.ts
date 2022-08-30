@@ -28,7 +28,7 @@ export class LiveComponent implements OnInit {
   isAdmitted = false;
   username = '';
   users: any = {};
-  constrainWidth = { min: 250, ideal: 800, max: 1920 };
+  constrainWidth = { min: 250, ideal: 1500, max: 1920 };
   constrainHeight = { min: 100, ideal: 400, max: 1080 };
   myStream: MediaStream = new MediaStream();
   isPeerOpend = false;
@@ -380,17 +380,24 @@ export class LiveComponent implements OnInit {
     console.log('resing : ', container);
     const userKeys = Object.keys(this.users);
     console.log('user keys: ', userKeys);
-
+    if (userKeys.length == 0) {
+      console.log('no user yet');
+      const card = document.getElementById(
+        this.callService.getPeer()?.id || this.username
+      ) as HTMLElement;
+      card.style.maxWidth = '1000px';
+    }
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
 
       if (usersLen == 1) {
-        card.style.maxWidth = '800px';
+        card.style.maxWidth = '98%';
       } else if (usersLen == 2) {
         container.className = 'content position-relative';
+        container.style.maxWidth = '100%';
         if (userKeys[i] !== this.callService.getPeer()?.id) {
-          card.style.maxWidth = '100vw';
+          card.style.maxWidth = '98%';
         } else {
           card.style.maxWidth = '200px';
           card.style.bottom = '0';
