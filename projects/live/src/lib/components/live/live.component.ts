@@ -65,6 +65,11 @@ export class LiveComponent implements OnInit {
     setTimeout(() => {
       this.showButtons = true;
     }, 3000);
+    this.users['test-video'] = {
+      peerId: 'test-video',
+      socketId: '3233-sdsdis',
+      username: 'Test User',
+    };
   }
 
   async ngOnInit() {
@@ -380,28 +385,30 @@ export class LiveComponent implements OnInit {
     for (let i = 0; i < usersLen; i++) {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
 
-      if (usersLen < 5) {
-        card.style.maxWidth = '500px';
-
-        // container.style.gridAutoRows = '350px ';
-      }
       if (usersLen == 1) {
         card.style.maxWidth = '800px';
-        // container.style.gridAutoRows = '800px ';
-      }
-      if (usersLen < 10 && usersLen >= 5) {
+      } else if (usersLen == 2) {
+        container.className = 'content position-relative';
+        if (userKeys[i] !== this.callService.getPeer()?.id) {
+          card.style.maxWidth = '100vw';
+        } else {
+          card.style.maxWidth = '200px';
+          card.style.bottom = '0';
+          card.style.right = '0';
+          card.className = 'card position-absolute';
+        }
+      } else if (usersLen < 5 && usersLen > 2) {
+        card.style.maxWidth = '500px';
+      } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
         // container.style.gridAutoRows = '350px ';
-      }
-      if (usersLen < 15 && usersLen >= 10) {
+      } else if (usersLen < 15 && usersLen >= 10) {
         card.style.maxWidth = '350px';
         // container.style.gridAutoRows = '200px ';
-      }
-      if (usersLen < 20 && usersLen >= 15) {
+      } else if (usersLen < 20 && usersLen >= 15) {
         card.style.maxWidth = '300px';
         // container.style.gridAutoRows = '200px ';
-      }
-      if (this.users.length >= 20) {
+      } else if (this.users.length >= 20) {
         card.style.maxWidth = '250px';
         // container.style.gridAutoRows = '200px ';
       }
