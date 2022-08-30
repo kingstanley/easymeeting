@@ -405,10 +405,12 @@ export class LiveComponent implements OnInit {
           card.className = 'card position-absolute';
         }
       } else if (usersLen < 5 && usersLen > 2) {
+        container.className = 'content';
         if (userKeys[i] == this.callService.getPeer()?.id) {
           card.style.maxWidth = '600px';
           card.style.bottom = '';
           card.style.right = '';
+          card.className = 'card';
         } else card.style.maxWidth = '600px';
       } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
