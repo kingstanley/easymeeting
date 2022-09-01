@@ -27,5 +27,7 @@ export class ActionsComponent implements OnInit {
     this.isMicMuted = !this.isMicMuted;
     this.emitMicToggle.emit(this.isMicMuted);
   }
-  present() {}
+  present() {
+    this.emitPresent.emit(true);
+  }
 }

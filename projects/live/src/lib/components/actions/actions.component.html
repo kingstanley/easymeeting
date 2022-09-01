@@ -17,7 +17,7 @@
   </button>
   <button mat-button mat-mini-fab color="primary" *ngIf="isMicMuted" (click)='toggleMic()'>
     <mat-icon class="mat-18">mic_off</mat-icon>
-  </button><button mat-button mat-mini-fab color="primary">
+  </button><button mat-button mat-mini-fab color="primary" (click)="present()">
     <mat-icon class="mat-18">screen_share</mat-icon>
   </button>
   <button mat-button mat-mini-fab>

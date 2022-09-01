@@ -406,9 +406,10 @@ export class LiveComponent implements OnInit {
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
-
+      card.className = 'card bg-dark';
       if (usersLen == 1) {
         card.style.maxWidth = '100%';
+        card.style.maxHeight = '100%';
       } else if (usersLen == 2) {
         container.className = 'content position-relative';
         // container.style.maxWidth = '100%';
@@ -419,7 +420,7 @@ export class LiveComponent implements OnInit {
           card.style.maxWidth = '200px';
           card.style.bottom = '0';
           card.style.right = '0';
-          card.className = 'card position-absolute';
+          card.className = 'card bg-dark position-absolute';
         }
       } else if (usersLen < 5 && usersLen > 2) {
         container.className = 'content';
@@ -427,7 +428,7 @@ export class LiveComponent implements OnInit {
           card.style.maxWidth = '600px';
           card.style.bottom = '';
           card.style.right = '';
-          card.className = 'card';
+          card.className = 'card bg-dark';
         } else card.style.maxWidth = '500px';
       } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
@@ -674,5 +675,22 @@ export class LiveComponent implements OnInit {
         // this.myStream.getTracks().forEach((track) => track.stop());
         // await this.getMediaStream();
       });
+  }
+  async getScreenMedia() {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia();
+    console.log('screen media: ', screenStream);
+    const track = screenStream.getTracks()[0];
+    console.log('track: ', track);
+    const videoTrack = this.myStream.getVideoTracks()[0];
+    this.myStream.removeTrack(videoTrack);
+    this.myStream.addTrack(track);
+    track.onended = () => {
+      this.myStream.removeTrack(track);
+      this.myStream.addTrack(videoTrack);
+    };
+  }
+  shareScreen(value?: boolean) {
+    console.log('present: ', value);
+    this.getScreenMedia();
   }
 }

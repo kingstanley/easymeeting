@@ -40,4 +40,4 @@
 </main>
 
 <app-actions (emitMicToggle)="toggleMic($event)" (emitCamToggle)="toggleCam($event)" (emitEndCall)="endCall($event)"
-  class="action-buttons" *ngIf="isAdmitted"></app-actions>
+  class="action-buttons" *ngIf="isAdmitted" (emitPresent)="shareScreen($event)"></app-actions>
