@@ -1,0 +1,24 @@
+<div style="float:right">
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<div style="display: flex; gap:5px">
+
+
+  <div id="controls" style="display: flex;flex-direction:column">
+    <mat-form-field>
+      <mat-label>Change Camera</mat-label>
+      <mat-select [(ngModel)]="selectedVideoDevice" placeholder="Change Camera">
+        <mat-option *ngFor="let item of videoDevices" [value]="item.deviceId">{{item.label}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Change Microphone</mat-label>
+      <mat-select [(ngModel)]="selectedAudioDevice" placeholder="Change Microphone">
+        <mat-option *ngFor="let item of audioDevices" [value]="item.deviceId">{{item.label}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+</div>

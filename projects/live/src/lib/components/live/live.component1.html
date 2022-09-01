@@ -1,9 +1,10 @@
-<main style="overflow-y: scroll;" id="main">
+<main style="overflow-y: scroll; position: relative;" id="main">
   <!-- <div class="ask-screen "> -->
-  <div class="content">
+  <div class="content" style=" ">
     <!-- <video id="test-video" src="assets/Feed.mp4" width="500px"></video> -->
+
   </div>
-  <div class="action" id="action">
+  <div class="action" id="action" style=" ">
     <mat-form-field appearance="outline">
       <input matInput [(ngModel)]="username" placeholder="Name or organization">
     </mat-form-field>
@@ -15,9 +16,28 @@
         color="primary">Join</button>
       <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
     </div>
+
   </div>
   <!-- </div> -->
+  <div *ngIf="!isAdmitted" style="flex: 0 0 70%;margin-top: -100px; overflow: hidden;">
+    <button *ngIf="isCamOn" mat-button mat-mini-fab color="primary" class="m-1" (click)='toggleCam(true)'>
+      <mat-icon class="mat-18">videocam_off</mat-icon>
+    </button>
+    <button *ngIf="!isCamOn" mat-button mat-mini-fab color="primary" class="m-1" (click)='toggleCam(false)'>
+      <mat-icon class="mat-18">videocam</mat-icon>
+    </button>
+    <button *ngIf="!isMicOn" mat-button mat-mini-fab color="primary" class="m-1" (click)='toggleMic(true)'>
+      <mat-icon class="mat-18">microphone</mat-icon>
+    </button>
+    <button *ngIf="isMicOn" mat-button mat-mini-fab color="primary" class="m-1" (click)='toggleMic(false)'>
+      <mat-icon class="mat-18">mic_off</mat-icon>
+    </button>
+    <button mat-button color="primary" class="m-1" (click)='OpenSettings()'>
+      <mat-icon class="mat-18">more_vert</mat-icon>
+    </button>
 
+  </div>
 </main>
+
 <app-actions (emitMicToggle)="toggleMic($event)" (emitCamToggle)="toggleCam($event)" (emitEndCall)="endCall($event)"
   class="action-buttons" *ngIf="isAdmitted"></app-actions>

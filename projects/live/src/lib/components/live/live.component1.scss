@@ -54,7 +54,9 @@
      gap: 10px;
      color: white;
      overflow: hidden;
+     flex-wrap: wrap;
    }
+
 
    video {
      width: 100% !important;

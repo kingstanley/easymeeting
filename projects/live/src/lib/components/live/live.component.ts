@@ -9,6 +9,7 @@ import { CallService } from 'src/app/shared/call.service';
 import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
 import { AdmitComponent } from '../admit/admit.component';
+import { SettingComponent } from '../setting/setting.component';
 
 @Component({
   selector: 'meet-live',
@@ -23,6 +24,8 @@ export class LiveComponent implements OnInit {
      flex: 1;`;
   peers = Object.assign({});
   streams: Array<any> = [];
+  isMicOn = true;
+  isCamOn = true;
   ROOM_ID = '';
   averageRating = 0;
   isAdmitted = false;
@@ -51,6 +54,8 @@ export class LiveComponent implements OnInit {
         facingMode: 'user';
       } = true;
   useAudio: boolean | MediaTrackConstraints | undefined = true;
+  selectedAudioDevice: ConstrainDOMString | undefined;
+  selectedVideoDevice: ConstrainDOMString | undefined;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -73,6 +78,9 @@ export class LiveComponent implements OnInit {
   }
 
   async ngOnInit() {
+    navigator.mediaDevices.addEventListener('devicechange', (event) => {
+      console.log('event: ', event);
+    });
     this.user = this.authService.getUser();
     console.log('loggedIn user: ', this.user);
 
@@ -363,7 +371,11 @@ export class LiveComponent implements OnInit {
 
   async getMediaStream() {
     this.myStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        deviceId: this.selectedAudioDevice,
+      },
       video: {
         width: {
           min: this.constrainWidth.min,
@@ -375,6 +387,7 @@ export class LiveComponent implements OnInit {
         echoCancellation: true,
         noiseSuppression: true,
         sampleSize: 100,
+        deviceId: this.selectedVideoDevice,
       },
     });
   }
@@ -388,7 +401,7 @@ export class LiveComponent implements OnInit {
       const card = document.getElementById(
         this.callService.getPeer()?.id || this.username
       ) as HTMLElement;
-      card.style.maxWidth = '1000px';
+      card.style.maxWidth = '800px';
     }
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
@@ -401,6 +414,7 @@ export class LiveComponent implements OnInit {
         // container.style.maxWidth = '100%';
         if (userKeys[i] !== this.callService.getPeer()?.id) {
           card.style.maxWidth = '100%';
+          card.style.maxHeight = '100%';
         } else {
           card.style.maxWidth = '200px';
           card.style.bottom = '0';
@@ -480,6 +494,7 @@ export class LiveComponent implements OnInit {
     const userVideoExist = document.getElementById(peerId) as HTMLDivElement;
     if (!userVideoExist) {
       holder.id = peerId;
+      holder.style.flex = '1';
       holder.prepend(usernameLabl);
       holder.append(video);
       videoGrid.prepend(holder);
@@ -604,17 +619,6 @@ export class LiveComponent implements OnInit {
         peerId,
         socketId
       );
-      // } else {
-      //   console.log('User video already exist 1');
-      //   const videos = userVideoExist.getElementsByTagName('video');
-      //   console.log('videos len: ', videos.length);
-
-      //   for (let i = 0; i < videos.length; i++) {
-      //     videos[i].parentNode?.removeChild(videos[i]);
-      //   }
-      //   userVideo.srcObject = userVideoStream;
-      //   userVideoExist.append(userVideo);
-      // }
       call.on('close', () => {
         userVideo?.remove();
         // remove the container of the user video
@@ -625,9 +629,6 @@ export class LiveComponent implements OnInit {
     this.peers[peerId] = call;
 
     console.log('peers: ', this.peers);
-    // } else {
-    //   console.log('peer already exist');
-    // }
   }
   endCall(result: boolean) {
     console.log('end call clicked');
@@ -644,9 +645,34 @@ export class LiveComponent implements OnInit {
   toggleMic(value: boolean) {
     const audioTrack = this.myStream.getAudioTracks();
     audioTrack[0].enabled = !value;
+    this.isMicOn = !this.isMicOn;
   }
   toggleCam(value: boolean) {
     const videoTrack = this.myStream.getVideoTracks();
     videoTrack[0].enabled = !value;
+    this.isCamOn = !this.isCamOn;
+  }
+  OpenSettings() {
+    // 07046583858
+    this.dialog
+      .open(SettingComponent, {
+        width: '100%',
+        height: '100%',
+        hasBackdrop: false,
+        data: { streams: this.myStream },
+      })
+      .afterClosed()
+      .subscribe(async (result) => {
+        console.log('setting result: ', result);
+
+        if (result.selectedAudioDevice) {
+          this.selectedAudioDevice = result.selectedAudioDevice;
+        }
+        if (result.selectedVideoDevice) {
+          this.selectedVideoDevice = result.selectedVideoDevice;
+        }
+        // this.myStream.getTracks().forEach((track) => track.stop());
+        // await this.getMediaStream();
+      });
   }
 }

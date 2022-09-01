@@ -10,6 +10,7 @@ import { ContainerComponent } from './components/container/container.component';
 import { ActionsComponent } from './components/actions/actions.component';
 import { AngularMaterialModule } from 'projects/angular-material/src';
 import { SharedModule } from 'projects/shared/src';
+import { SettingComponent } from './components/setting/setting.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { SharedModule } from 'projects/shared/src';
     JoinComponent,
     ContainerComponent,
     ActionsComponent,
+    SettingComponent,
   ],
   imports: [
     LiveRoutes,
