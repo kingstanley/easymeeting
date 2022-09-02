@@ -629,7 +629,6 @@ export class LiveComponent implements OnInit {
       // call.peerConnection.getSenders()[0].replaceTrack();
     });
     this.peers[peerId] = call;
-
     console.log('peers: ', this.peers);
   }
   endCall(result: boolean) {
@@ -689,7 +688,10 @@ export class LiveComponent implements OnInit {
       const calls: any = Object.values(this.peers);
       console.log('calls: ', calls);
       for (const call of calls) {
-        call.peerConnection.getSenders()[0].replaceTrack(track);
+        call?.peerConnection
+          .getSenders()
+          .forEach((sender: any) => sender.replaceTrack(track));
+        // call.peerConnection.getSenders()[0].replaceTrack(track);
       }
       track.onended = () => {
         this.myStream.removeTrack(track);
