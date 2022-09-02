@@ -410,12 +410,7 @@ export class LiveComponent implements OnInit {
       const card = document.getElementById(
         this.callService.getPeer()?.id || this.username
       ) as HTMLElement;
-      card.style.minWidth = '60%';
-      if (this.wWidth > 750) {
-        card.style.maxWidth = this.wWidth / 2 + 'px';
-      } else {
-        card.style.maxWidth = this.wWidth - 200 + 'px';
-      }
+      card.style.maxWidth = '800px';
     }
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
@@ -423,7 +418,7 @@ export class LiveComponent implements OnInit {
       card.className = 'card bg-dark';
       if (usersLen == 1) {
         card.style.maxWidth = '100%';
-        card.style.maxHeight = '100vh';
+        card.style.maxHeight = '100%';
       } else if (usersLen == 2) {
         container.className = 'content position-relative';
         // container.style.maxWidth = '100%';
@@ -439,22 +434,22 @@ export class LiveComponent implements OnInit {
       } else if (usersLen < 5 && usersLen > 2) {
         container.className = 'content';
         if (userKeys[i] == this.callService.getPeer()?.id) {
-          card.style.maxWidth = '45%';
+          card.style.maxWidth = '600px';
           card.style.bottom = '';
           card.style.right = '';
           card.className = 'card bg-dark';
-        } else card.style.maxWidth = '45%';
+        } else card.style.maxWidth = '600px';
       } else if (usersLen < 10 && usersLen >= 5) {
-        card.style.maxWidth = '28%';
+        card.style.maxWidth = '400px';
         // container.style.gridAutoRows = '350px ';
       } else if (usersLen < 15 && usersLen >= 10) {
-        card.style.maxWidth = '23%';
+        card.style.maxWidth = '350px';
         // container.style.gridAutoRows = '200px ';
       } else if (usersLen < 20 && usersLen >= 15) {
-        card.style.maxWidth = '18%';
+        card.style.maxWidth = '300px';
         // container.style.gridAutoRows = '200px ';
       } else if (this.users.length >= 20) {
-        card.style.maxWidth = '15%';
+        card.style.maxWidth = '250px';
         // container.style.gridAutoRows = '200px ';
       }
     }
@@ -729,14 +724,15 @@ export class LiveComponent implements OnInit {
     this.getScreenMedia();
   }
   setPresentationScreen(peerId: string) {
+    console.log('presentation peerId: ', peerId);
     const container = document.querySelector('.content') as HTMLDivElement;
     const usersCards = container.getElementsByTagName('div');
     for (let i = 0; i < usersCards.length; i++) {
       const card = usersCards.item(0) as HTMLDivElement;
       if (card?.id == peerId) {
-        card.style.minWidth = '80%';
+        card.style.maxWidth = '1000px';
       } else {
-        card.style.minWidth = '10%';
+        card.style.maxWidth = '100px';
       }
     }
   }
