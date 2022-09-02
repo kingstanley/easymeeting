@@ -626,6 +626,7 @@ export class LiveComponent implements OnInit {
         document.getElementById(peerId)?.remove();
         this.resizeContainer();
       });
+      // call.peerConnection.getSenders()[0].replaceTrack();
     });
     this.peers[peerId] = call;
 
@@ -684,9 +685,16 @@ export class LiveComponent implements OnInit {
     const videoTrack = this.myStream.getVideoTracks()[0];
     this.myStream.removeTrack(videoTrack);
     this.myStream.addTrack(track);
+    const calls: any = Object.values(this.peers);
+    console.log('calls: ', calls);
+    for (const call of calls) {
+      call.peerConnection.getSenders()[0].replaceTrack(track);
+    }
     track.onended = () => {
       this.myStream.removeTrack(track);
       this.myStream.addTrack(videoTrack);
+
+      calls[0].peerConnection.getSenders()[0].replaceTrack(videoTrack);
     };
   }
   shareScreen(value?: boolean) {
