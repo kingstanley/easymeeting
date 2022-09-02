@@ -10,6 +10,7 @@ import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
 import { AdmitComponent } from '../admit/admit.component';
 import { SettingComponent } from '../setting/setting.component';
+// import {request} from 'express'
 
 @Component({
   selector: 'meet-live',
@@ -56,6 +57,8 @@ export class LiveComponent implements OnInit {
   useAudio: boolean | MediaTrackConstraints | undefined = true;
   selectedAudioDevice: ConstrainDOMString | undefined;
   selectedVideoDevice: ConstrainDOMString | undefined;
+  wHeight: number;
+  wWidth: number;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -75,6 +78,10 @@ export class LiveComponent implements OnInit {
     //   socketId: '3233-sdsdis',
     //   username: 'Test User',
     // };
+    console.log('Height: ', window.innerHeight);
+    console.log('Width: ', window.innerWidth);
+    this.wHeight = window.innerHeight;
+    this.wWidth = window.innerWidth;
   }
 
   async ngOnInit() {
@@ -108,7 +115,9 @@ export class LiveComponent implements OnInit {
       // console.log('asked to turn on mic: ', peerId, socketId);
       this.myStream.getAudioTracks()[0].enabled = true;
     });
-
+    this.socket.on('presentation', (peerId: string) => {
+      this.setPresentationScreen(peerId);
+    });
     console.log('io socket: ', this.chatService.Socket.ioSocket);
     this.chatService.sendMessage('hello', 'Hello server');
 
@@ -401,7 +410,12 @@ export class LiveComponent implements OnInit {
       const card = document.getElementById(
         this.callService.getPeer()?.id || this.username
       ) as HTMLElement;
-      card.style.maxWidth = '800px';
+      card.style.minWidth = '60%';
+      if (this.wWidth > 750) {
+        card.style.maxWidth = this.wWidth / 2 + 'px';
+      } else {
+        card.style.maxWidth = this.wWidth - 200 + 'px';
+      }
     }
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
@@ -409,7 +423,7 @@ export class LiveComponent implements OnInit {
       card.className = 'card bg-dark';
       if (usersLen == 1) {
         card.style.maxWidth = '100%';
-        card.style.maxHeight = '100%';
+        card.style.maxHeight = '100vh';
       } else if (usersLen == 2) {
         container.className = 'content position-relative';
         // container.style.maxWidth = '100%';
@@ -425,22 +439,22 @@ export class LiveComponent implements OnInit {
       } else if (usersLen < 5 && usersLen > 2) {
         container.className = 'content';
         if (userKeys[i] == this.callService.getPeer()?.id) {
-          card.style.maxWidth = '600px';
+          card.style.maxWidth = '45%';
           card.style.bottom = '';
           card.style.right = '';
           card.className = 'card bg-dark';
-        } else card.style.maxWidth = '500px';
+        } else card.style.maxWidth = '45%';
       } else if (usersLen < 10 && usersLen >= 5) {
-        card.style.maxWidth = '400px';
+        card.style.maxWidth = '28%';
         // container.style.gridAutoRows = '350px ';
       } else if (usersLen < 15 && usersLen >= 10) {
-        card.style.maxWidth = '350px';
+        card.style.maxWidth = '23%';
         // container.style.gridAutoRows = '200px ';
       } else if (usersLen < 20 && usersLen >= 15) {
-        card.style.maxWidth = '300px';
+        card.style.maxWidth = '18%';
         // container.style.gridAutoRows = '200px ';
       } else if (this.users.length >= 20) {
-        card.style.maxWidth = '250px';
+        card.style.maxWidth = '15%';
         // container.style.gridAutoRows = '200px ';
       }
     }
@@ -691,23 +705,39 @@ export class LiveComponent implements OnInit {
         call?.peerConnection
           .getSenders()
           .forEach((sender: any) => sender.replaceTrack(track));
-        // call.peerConnection.getSenders()[0].replaceTrack(track);
-        console.log('senders: ', call?.peerConnection.getSenders());
       }
       track.onended = () => {
         this.myStream.removeTrack(track);
         this.myStream.addTrack(videoTrack);
 
-        calls[0]?.peerConnection
-          .getSenders()
-          .forEach((sender: any) => sender.replaceTrack(videoTrack));
+        for (const call of calls) {
+          call?.peerConnection
+            .getSenders()
+            .forEach((sender: any) => sender.replaceTrack(videoTrack));
+        }
       };
     } catch (error) {
       console.log('Error in screen sharing: ', error);
     }
   }
   shareScreen(value?: boolean) {
-    console.log('present: ', value);
+    this.socket.emit(
+      'presentation',
+      this.callService.getPeer()?.id,
+      this.socket.ioSocket.id
+    );
     this.getScreenMedia();
+  }
+  setPresentationScreen(peerId: string) {
+    const container = document.querySelector('.content') as HTMLDivElement;
+    const usersCards = container.getElementsByTagName('div');
+    for (let i = 0; i < usersCards.length; i++) {
+      const card = usersCards.item(0) as HTMLDivElement;
+      if (card?.id == peerId) {
+        card.style.minWidth = '80%';
+      } else {
+        card.style.minWidth = '10%';
+      }
+    }
   }
 }
