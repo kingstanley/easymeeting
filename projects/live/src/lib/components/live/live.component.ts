@@ -692,6 +692,7 @@ export class LiveComponent implements OnInit {
           .getSenders()
           .forEach((sender: any) => sender.replaceTrack(track));
         // call.peerConnection.getSenders()[0].replaceTrack(track);
+        console.log('senders: ', call?.peerConnection.getSenders());
       }
       track.onended = () => {
         this.myStream.removeTrack(track);
