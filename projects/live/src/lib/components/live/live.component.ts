@@ -698,7 +698,9 @@ export class LiveComponent implements OnInit {
         this.myStream.removeTrack(track);
         this.myStream.addTrack(videoTrack);
 
-        calls[0].peerConnection.getSenders()[0].replaceTrack(videoTrack);
+        calls[0]?.peerConnection
+          .getSenders()
+          .forEach((sender: any) => sender.replaceTrack(videoTrack));
       };
     } catch (error) {
       console.log('Error in screen sharing: ', error);
