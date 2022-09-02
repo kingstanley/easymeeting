@@ -678,24 +678,28 @@ export class LiveComponent implements OnInit {
       });
   }
   async getScreenMedia() {
-    const screenStream = await navigator.mediaDevices.getDisplayMedia();
-    console.log('screen media: ', screenStream);
-    const track = screenStream.getTracks()[0];
-    console.log('track: ', track);
-    const videoTrack = this.myStream.getVideoTracks()[0];
-    this.myStream.removeTrack(videoTrack);
-    this.myStream.addTrack(track);
-    const calls: any = Object.values(this.peers);
-    console.log('calls: ', calls);
-    for (const call of calls) {
-      call.peerConnection.getSenders()[0].replaceTrack(track);
-    }
-    track.onended = () => {
-      this.myStream.removeTrack(track);
-      this.myStream.addTrack(videoTrack);
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia();
+      console.log('screen media: ', screenStream);
+      const track = screenStream.getTracks()[0];
+      console.log('track: ', track);
+      const videoTrack = this.myStream.getVideoTracks()[0];
+      this.myStream.removeTrack(videoTrack);
+      this.myStream.addTrack(track);
+      const calls: any = Object.values(this.peers);
+      console.log('calls: ', calls);
+      for (const call of calls) {
+        call.peerConnection.getSenders()[0].replaceTrack(track);
+      }
+      track.onended = () => {
+        this.myStream.removeTrack(track);
+        this.myStream.addTrack(videoTrack);
 
-      calls[0].peerConnection.getSenders()[0].replaceTrack(videoTrack);
-    };
+        calls[0].peerConnection.getSenders()[0].replaceTrack(videoTrack);
+      };
+    } catch (error) {
+      console.log('Error in screen sharing: ', error);
+    }
   }
   shareScreen(value?: boolean) {
     console.log('present: ', value);
