@@ -1,18 +1,18 @@
 <div class="main bg-dark">
-  <div class="video-grid">
+  <div id="content" class="row">
     <!-- <div class="">
       <video src="assets/Feed.mp4"></video>
     </div>
     <div class="">
       <video src="assets/Feed.mp4"></video>
     </div> -->
-    <!-- <div class="item">
+    <!-- <div class="col-md-4">
       <video src="assets/Feed.mp4"></video>
     </div>
-    <div class="item">
+    <div class="col-md-4">
       <video src="assets/Feed.mp4"></video>
     </div>
-    <div class="item">
+    <div class="col-md-4">
       <video src="assets/Feed.mp4"></video>
     </div> -->
     <!--  <div class="holder">
@@ -204,6 +204,20 @@
       using just six lines of CSS code. Not bad, huh? Make sure you
       check the source code and play around with this example on
     </div> -->
+  </div>
+  <div class="action" id="action" style=" ">
+    <mat-form-field appearance="outline">
+      <input matInput [(ngModel)]="username" placeholder="Name or organization">
+    </mat-form-field>
+    <div class="buttons">
+      <button *ngIf="!isAdmin()" [disabled]="!showButtons" mat-raised-button (click)="askToJoin()" color="primary">Ask
+        to
+        Join</button>
+      <button *ngIf="isAdmin() " [disabled]="!showButtons" mat-raised-button (click)="joinAsAdmin()"
+        color="primary">Join</button>
+      <button mat-raised-button (click)="cancelJoin()" color="warn">Leave</button>
+    </div>
+
   </div>
   <div class="side-nav">
     side nav
