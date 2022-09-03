@@ -2,10 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 // import { TopNavComponent } from 'libs/dashboard/src/lib/components/top-nav/top-nav.component';
-import { HomeComponent } from './components/home/home.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
+  // { path: '', component: HomeComponent },
   // {
   //   path: 'meeting',
   //   component: TopNavComponent,
@@ -17,7 +16,7 @@ const routes: Routes = [
   //   ],
   // },
   {
-    path: 'meeting',
+    path: '',
     loadChildren: () => import('projects/live/src').then((m) => m.LiveModule),
   },
   {

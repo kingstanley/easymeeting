@@ -1,124 +1,125 @@
-  //  .content,
-  //  .ask-screen {
-  //    display: flex;
-  //    flex-direction: row;
-  //    gap: 5px;
-  //    flex-wrap: wrap;
-  //    height: 100vh;
-  //    justify-content: center;
-  //    align-items: center;
-  //  }
-  .content {
-    display: grid;
-    gap: 5px;
-    // display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
-    // align-items: center;
-    // gap: 2px;
-    justify-items: center;
-    // overflow: hidden;
-    // place-self: center;
-    // align-content: stretch;
-    justify-content: center;
-  }
+   .content,
+   .ask-screen {
+     display: flex;
+     flex-direction: row;
+     gap: 5px;
+     flex-wrap: wrap;
+     height: 100vh;
+     justify-content: center;
+     align-items: center;
+   }
 
-  .item {
-    min-width: 4000px;
-    height: auto;
-    position: relative;
-    //  flex: 1;
-  }
+   // .content {
+   //   display: grid;
+   //   gap: 5px;
+   //   // display: grid;
+   //   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   //   grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
+   //   // align-items: center;
+   //   // gap: 2px;
+   //   justify-items: center;
+   //   // overflow: hidden;
+   //   // place-self: center;
+   //   // align-content: stretch;
+   //   justify-content: center;
+   // }
 
-  .item1 {
-    //  width: 100px;
-    width: 300px;
-    height: auto;
-    flex: 1;
-    position: relative;
-  }
+   .item {
+     min-width: 4000px;
+     height: auto;
+     position: relative;
+     //  flex: 1;
+   }
 
-  .item2 {
-    //  min-width: 100px;
-    width: 250px;
-    height: auto;
-    flex: 1;
-  }
+   .item1 {
+     //  width: 100px;
+     width: 300px;
+     height: auto;
+     flex: 1;
+     position: relative;
+   }
 
-  .item3 {
-    min-width: 100px;
-    max-width: 200px;
-    max-height: 150px;
-    flex: 1;
-  }
+   .item2 {
+     //  min-width: 100px;
+     width: 250px;
+     height: auto;
+     flex: 1;
+   }
 
-  main {
-    //  justify-content: center;
-    //  align-items: center;
-    display: flex;
-    text-align: center;
-    background-color: rgb(69, 60, 60);
-    width: 100vw;
-    min-height: 100vh;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    overflow: hidden;
-    flex-wrap: wrap;
-  }
+   .item3 {
+     min-width: 100px;
+     max-width: 200px;
+     max-height: 150px;
+     flex: 1;
+   }
+
+   main {
+     //  justify-content: center;
+     //  align-items: center;
+     display: flex;
+     text-align: center;
+     background-color: rgb(69, 60, 60);
+     width: 100vw;
+     min-height: 100vh;
+     justify-content: center;
+     align-items: center;
+     gap: 10px;
+     color: white;
+     overflow: hidden;
+     flex-wrap: wrap;
+   }
 
 
-  video {
-    width: 100% !important;
-    height: auto !important;
-    --aspect-ratio: 16 / 9;
-    place-self: center;
-    object-fit: cover;
-    position: fixed;
-  }
+   video {
+     width: 100% !important;
+     height: auto !important;
+     --aspect-ratio: 16 / 9;
+     place-self: center;
+     object-fit: cover;
+     position: fixed;
+   }
 
-  .ask-screen {
-    color: white;
-    justify-content: space-evenly;
-  }
+   .ask-screen {
+     color: white;
+     justify-content: space-evenly;
+   }
 
-  .preview {
-    max-width: 800px;
-    // max-height: 500px;
-  }
+   .preview {
+     max-width: 800px;
+     // max-height: 500px;
+   }
 
-  .action {
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    // max-height: ;
-  }
+   .action {
+     max-width: 500px;
+     display: flex;
+     flex-direction: column;
+     // max-height: ;
+   }
 
-  .buttons {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-  }
+   .buttons {
+     display: flex;
+     flex-direction: row;
+     gap: 10px;
+   }
 
-  .uholder {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-  }
+   .uholder {
+     display: flex;
+     justify-content: space-between;
+     align-items: stretch;
+   }
 
-  button {
-    cursor: hand;
-  }
+   button {
+     cursor: hand;
+   }
 
-  //  .action-buttons {
-  //    display: none;
-  //  }
+   //  .action-buttons {
+   //    display: none;
+   //  }
 
-  //  #main:hover+.action-buttons {
-  //    display: flex;
-  //  }
+   //  #main:hover+.action-buttons {
+   //    display: flex;
+   //  }
 
-  //  .action-button:hover {
-  //    display: flex;
-  //  }
+   //  .action-button:hover {
+   //    display: flex;
+   //  }

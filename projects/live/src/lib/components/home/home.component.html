@@ -1,0 +1,19 @@
+<mat-toolbar>
+  <button *ngIf="loggedIn" mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <img src="assets/easymeet.png" alt="" class="img-fluid m-1" style="width: 20px;background:white">
+  <span>Easy Meeting</span>
+  <span class="example-spacer"></span>
+  <div class="right-actions">
+    <button mat-button routerLink="/account">Sign In</button>
+    <!-- <button (click)="joinMeeting()" mat-button class="example-icon favorite-icon"
+      aria-label="Example icon-button with heart icon">
+      Join a meeting
+    </button> -->
+    <button (click)="startMeeting()" mat-raised-button class="example-icon"
+      aria-label="Example icon-button with share icon">
+      Start a meeting
+    </button>
+  </div>
+</mat-toolbar>

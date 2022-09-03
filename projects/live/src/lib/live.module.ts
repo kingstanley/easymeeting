@@ -11,6 +11,7 @@ import { ActionsComponent } from './components/actions/actions.component';
 import { AngularMaterialModule } from 'projects/angular-material/src';
 import { SharedModule } from 'projects/shared/src';
 import { SettingComponent } from './components/setting/setting.component';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { SettingComponent } from './components/setting/setting.component';
     ContainerComponent,
     ActionsComponent,
     SettingComponent,
+    HomeComponent,
   ],
   imports: [
     LiveRoutes,

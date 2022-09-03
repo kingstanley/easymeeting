@@ -15,8 +15,8 @@ import { SettingComponent } from '../setting/setting.component';
 @Component({
   selector: 'meet-live',
 
-  templateUrl: './live.component.html',
-  styleUrls: ['./live.component.scss'],
+  templateUrl: './live.component1.html',
+  styleUrls: ['./live.component1.scss'],
 })
 export class LiveComponent implements OnInit {
   cardStyle = ` min-width: 100px;
@@ -73,11 +73,11 @@ export class LiveComponent implements OnInit {
     setTimeout(() => {
       this.showButtons = true;
     }, 3000);
-    this.users['test-video'] = {
-      peerId: 'test-video',
-      socketId: '3233-sdsdis',
-      username: 'Test User',
-    };
+    // this.users['test-video'] = {
+    //   peerId: 'test-video',
+    //   socketId: '3233-sdsdis',
+    //   username: 'Test User',
+    // };
     console.log('Height: ', window.innerHeight);
     console.log('Width: ', window.innerWidth);
     this.wHeight = window.innerHeight;
@@ -419,53 +419,55 @@ export class LiveComponent implements OnInit {
     console.log('resing : ', container);
     const userKeys = Object.keys(this.users);
     console.log('user keys: ', userKeys);
+    const card = document.getElementById(
+      this.callService.getPeer()?.id || this.username
+    ) as HTMLElement;
     if (userKeys.length == 0) {
       console.log('no user yet');
-      const card = document.getElementById(
-        this.callService.getPeer()?.id || this.username
-      ) as HTMLElement;
-      // card.style.maxWidth = '800px';
+
+      card.style.maxWidth = '800px';
     }
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
-      // card?.className = 'card bg-dark';
-      // if (usersLen == 1) {
-      //   card.style.maxWidth = '100%';
-      //   card.style.maxHeight = '100%';
-      // } else if (usersLen == 2) {
-      //   container.className = 'content position-relative';
-      //   // container.style.maxWidth = '100%';
-      //   if (userKeys[i] !== this.callService.getPeer()?.id) {
-      //     card.style.maxWidth = '100%';
-      //     card.style.maxHeight = '100%';
-      //   } else {
-      //     card.style.maxWidth = '200px';
-      //     card.style.bottom = '0';
-      //     card.style.right = '0';
-      //     card.className = 'card bg-dark position-absolute';
-      //   }
-      // } else if (usersLen < 5 && usersLen > 2) {
-      //   container.className = 'content';
-      //   if (userKeys[i] == this.callService.getPeer()?.id) {
-      //     card.style.maxWidth = '600px';
-      //     card.style.bottom = '';
-      //     card.style.right = '';
-      //     card.className = 'card bg-dark';
-      //   } else card.style.maxWidth = '600px';
-      // } else if (usersLen < 10 && usersLen >= 5) {
-      //   card.style.maxWidth = '400px';
-      //   // container.style.gridAutoRows = '350px ';
-      // } else if (usersLen < 15 && usersLen >= 10) {
-      //   card.style.maxWidth = '350px';
-      //   // container.style.gridAutoRows = '200px ';
-      // } else if (usersLen < 20 && usersLen >= 15) {
-      //   card.style.maxWidth = '300px';
-      //   // container.style.gridAutoRows = '200px ';
-      // } else if (usersLen >= 20) {
-      //   card.style.maxWidth = '250px';
-      //   // container.style.gridAutoRows = '200px ';
-      // }
+      card.className = 'card bg-dark';
+
+      if (usersLen == 1) {
+        card.style.maxWidth = '100%';
+        card.style.maxHeight = '100%';
+      } else if (usersLen == 2) {
+        container.className = 'content position-relative';
+        container.style.maxWidth = '100%';
+        if (userKeys[i] !== this.callService.getPeer()?.id) {
+          card.style.maxWidth = '100%';
+          card.style.maxHeight = '100%';
+        } else {
+          card.style.maxWidth = '200px';
+          card.style.bottom = '0';
+          card.style.right = '0';
+          card.className = 'card bg-dark position-absolute';
+        }
+      } else if (usersLen < 5 && usersLen > 2) {
+        container.className = 'content';
+        if (userKeys[i] == this.callService.getPeer()?.id) {
+          card.style.maxWidth = '600px';
+          card.style.bottom = '';
+          card.style.right = '';
+          card.className = 'card bg-dark';
+        } else card.style.maxWidth = '600px';
+      } else if (usersLen < 10 && usersLen >= 5) {
+        card.style.maxWidth = '400px';
+        // container.style.gridAutoRows = '350px ';
+      } else if (usersLen < 15 && usersLen >= 10) {
+        card.style.maxWidth = '350px';
+        // container.style.gridAutoRows = '200px ';
+      } else if (usersLen < 20 && usersLen >= 15) {
+        card.style.maxWidth = '300px';
+        // container.style.gridAutoRows = '200px ';
+      } else if (usersLen >= 20) {
+        card.style.maxWidth = '250px';
+        // container.style.gridAutoRows = '200px ';
+      }
       // if (usersLen < 5) {
       //   container.style.gridTemplateColumns = '1fr 1fr';
       //   container.style.gridAutoRows = '350px ';
@@ -527,7 +529,7 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
-    holder.className = 'col-md-3';
+    holder.className = 'card bg-dark position-relative';
     // holder.style.maxWidth = '500px';
     // check if user already added to screen. If added replace video stream
 
@@ -548,7 +550,7 @@ export class LiveComponent implements OnInit {
     const userVideoExist = document.getElementById(peerId) as HTMLDivElement;
     if (!userVideoExist) {
       holder.id = peerId;
-      // holder.style.flex = '1';
+      holder.style.flex = '1';
       holder.prepend(usernameLabl);
       holder.append(video);
       videoGrid.prepend(holder);
@@ -569,7 +571,7 @@ export class LiveComponent implements OnInit {
         this.addControls(userVideoExist, peerId, socketId);
       }
     }
-    // this.resizeContainer();
+    this.resizeContainer();
     console.log('videoGrid: ', videoGrid);
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
@@ -694,7 +696,7 @@ export class LiveComponent implements OnInit {
       console.log('track: ', track);
       track.stop();
     });
-    window.location.href = '/meeting/live/' + this.meeting.code;
+    window.location.href = '/live/' + this.meeting.code;
   }
   toggleMic(value: boolean) {
     const audioTrack = this.myStream.getAudioTracks();

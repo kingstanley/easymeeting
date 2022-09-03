@@ -14,11 +14,13 @@ export class ContainerComponent implements OnInit {
   carouselItems = [
     {
       src: 'assets/look-your-best-on-video-call.jpg',
-      description: 'The description',
+      description:
+        'Calls with high privacy. Your meeting is end to end encrypted.',
     },
     {
       src: 'assets/call2.jpg',
-      description: 'The description of the second image',
+      description:
+        'call up to 100 people free. Record calls, Present screens or collaborate on a live white board.',
     },
   ];
   meetLinkControl = new FormControl('');
@@ -73,10 +75,7 @@ export class ContainerComponent implements OnInit {
     }, 5000);
   }
   joinMeeting(code?: string) {
-    this.router.navigate([
-      '/meeting/live',
-      code ? code : this.meetLinkControl.value,
-    ]);
+    this.router.navigate(['/live', code ? code : this.meetLinkControl.value]);
   }
   // keyPressEvent(event: KeyboardEvent) {
   //   console.log('event: ', event);

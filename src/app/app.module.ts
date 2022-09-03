@@ -9,7 +9,6 @@ import { SharedModule } from 'projects/shared/src';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './components/home/home.component';
 import { TokenInterceptorService } from './shared/token-interceptor.service';
 
 const config: SocketIoConfig = {
@@ -18,7 +17,7 @@ const config: SocketIoConfig = {
 };
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent],
+  declarations: [AppComponent],
   imports: [
     AngularMaterialModule,
     BrowserModule,

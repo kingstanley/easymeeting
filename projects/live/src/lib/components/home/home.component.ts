@@ -13,9 +13,9 @@ export class HomeComponent implements OnInit {
     console.log();
   }
   startMeeting() {
-    this.router.navigate(['/meeting/create']);
+    this.router.navigate(['/create']);
   }
   joinMeeting() {
-    this.router.navigate(['/meeting/']);
+    this.router.navigate(['/']);
   }
 }
