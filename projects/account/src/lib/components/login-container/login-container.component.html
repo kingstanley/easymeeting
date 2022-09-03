@@ -1,5 +1,7 @@
 <mat-card class="content">
-
+  <div class="text-center ">
+    <h3><img src="assets/easymeet.png" width="40" class="text-white" /> EasyMeet</h3>
+  </div>
   <meet-signin *ngIf="!toggleForm" (emitToggle)="toggle($event)"></meet-signin>
 
   <meet-sign-up *ngIf="toggleForm" (emitToggle)="toggle($event)"></meet-sign-up>
