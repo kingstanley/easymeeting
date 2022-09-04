@@ -30,7 +30,8 @@
           </mat-menu>
           <mat-form-field>
             <mat-icon class="mat-18" matSuffix>video</mat-icon>
-            <input [formControl]="meetLinkControl" matInput placeholder="Enter a code or link">
+            <input autocomplete="off" autofocus [formControl]="meetLinkControl" matInput
+              placeholder="Enter a code or link">
           </mat-form-field>
 
 

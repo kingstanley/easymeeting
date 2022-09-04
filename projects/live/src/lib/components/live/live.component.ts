@@ -709,7 +709,6 @@ export class LiveComponent implements OnInit {
     this.isCamOn = !this.isCamOn;
   }
   OpenSettings() {
-    // 07046583858
     this.dialog
       .open(SettingComponent, {
         width: '100%',
@@ -731,14 +730,15 @@ export class LiveComponent implements OnInit {
         // await this.getMediaStream();
       });
   }
+
   async getScreenMedia() {
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia();
       console.log('screen media: ', screenStream);
-      const track = screenStream.getTracks()[0];
+      const track = screenStream.getVideoTracks()[0];
       console.log('track: ', track);
       const videoTrack = this.myStream.getVideoTracks()[0];
-      this.myStream.removeTrack(videoTrack);
+      this.myStream.removeTrack(this.myStream.getVideoTracks()[0]);
       this.myStream.addTrack(track);
       const calls: any = Object.values(this.peers);
       console.log('calls: ', calls);
@@ -769,17 +769,25 @@ export class LiveComponent implements OnInit {
     );
     this.getScreenMedia();
   }
+
   setPresentationScreen(peerId: string) {
     console.log('presentation peerId: ', peerId);
     const container = document.getElementById('content') as HTMLDivElement;
     const usersCards = container.getElementsByTagName('div');
+    const otherUsersCard = document.createElement('div');
+    otherUsersCard.style.height = '10vh';
+    otherUsersCard.style.bottom = '0';
+    otherUsersCard.style.right = '0';
     for (let i = 0; i < usersCards.length; i++) {
-      const card = usersCards.item(0) as HTMLDivElement;
+      const card = usersCards.item(i) as HTMLDivElement;
       if (card?.id == peerId) {
-        card.style.maxWidth = '1000px';
+        card.style.maxWidth = '100%';
       } else {
-        card.style.maxWidth = '100px';
+        card.style.maxWidth = '300px';
+        otherUsersCard.append(card);
+        card.remove();
       }
     }
+    container.append(otherUsersCard);
   }
 }
