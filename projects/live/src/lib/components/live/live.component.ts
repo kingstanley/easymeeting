@@ -457,16 +457,16 @@ export class LiveComponent implements OnInit {
         } else if (usersLen < 5 && usersLen > 2) {
           container.className = 'content';
           if (userKeys[i] == this.callService.getPeer()?.id) {
-            card.style.maxWidth = '48%';
+            card.style.width = '48%';
             card.style.bottom = '';
             card.style.right = '';
             card.className = 'card bg-dark';
-          } else card.style.maxWidth = '48%';
+          } else card.style.minWidth = '48%';
         } else if (usersLen < 10 && usersLen >= 5) {
-          card.style.maxWidth = '400px';
+          card.style.width = '32%';
           // container.style.gridAutoRows = '350px ';
         } else if (usersLen < 15 && usersLen >= 10) {
-          card.style.maxWidth = '350px';
+          card.style.width = '24%';
           // container.style.gridAutoRows = '200px ';
         } else if (usersLen < 20 && usersLen >= 15) {
           card.style.maxWidth = '300px';
