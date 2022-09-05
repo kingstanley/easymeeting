@@ -791,6 +791,8 @@ export class LiveComponent implements OnInit {
     const container = document.getElementById('content') as HTMLDivElement;
     const usersCards = container.getElementsByTagName('div');
     const otherUsersCard = document.createElement('div');
+    otherUsersCard.style.display = 'flex';
+    otherUsersCard.style.gap = '5px';
     otherUsersCard.style.height = '10vh';
     otherUsersCard.style.bottom = '0';
     otherUsersCard.style.right = '0';
@@ -798,7 +800,7 @@ export class LiveComponent implements OnInit {
       const card = usersCards.item(i) as HTMLDivElement;
       if (card?.id == peerId) {
         console.log('presentation card: ', card);
-        card.style.maxWidth = '100%';
+        card.style.width = '100%';
       } else {
         card.style.maxWidth = '300px';
         otherUsersCard.append(card);
