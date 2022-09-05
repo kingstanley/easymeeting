@@ -437,44 +437,46 @@ export class LiveComponent implements OnInit {
     const usersLen = userKeys.length;
     for (let i = 0; i < usersLen; i++) {
       const card = document.getElementById(userKeys[i]) as HTMLDivElement;
-      card.className = 'card bg-dark';
-
-      if (usersLen == 1) {
-        card.style.maxWidth = '100%';
-        card.style.maxHeight = '100%';
-      } else if (usersLen == 2) {
-        container.className = 'content position-relative';
-        container.style.maxWidth = '100%';
-        if (userKeys[i] !== this.callService.getPeer()?.id) {
+      if (card) {
+        card.className = 'card bg-dark';
+        if (usersLen == 1) {
           card.style.maxWidth = '100%';
           card.style.maxHeight = '100%';
-        } else {
-          card.style.maxWidth = '200px';
-          card.style.bottom = '0';
-          card.style.right = '0';
-          card.className = 'card bg-dark position-absolute';
+        } else if (usersLen == 2) {
+          container.className = 'content position-relative';
+          container.style.maxWidth = '100%';
+          if (userKeys[i] !== this.callService.getPeer()?.id) {
+            card.style.maxWidth = '100%';
+            card.style.maxHeight = '100%';
+          } else {
+            card.style.maxWidth = '200px';
+            card.style.bottom = '0';
+            card.style.right = '0';
+            card.className = 'card bg-dark position-absolute';
+          }
+        } else if (usersLen < 5 && usersLen > 2) {
+          container.className = 'content';
+          if (userKeys[i] == this.callService.getPeer()?.id) {
+            card.style.maxWidth = '45%';
+            card.style.bottom = '';
+            card.style.right = '';
+            card.className = 'card bg-dark';
+          } else card.style.maxWidth = '28%';
+        } else if (usersLen < 10 && usersLen >= 5) {
+          card.style.maxWidth = '400px';
+          // container.style.gridAutoRows = '350px ';
+        } else if (usersLen < 15 && usersLen >= 10) {
+          card.style.maxWidth = '350px';
+          // container.style.gridAutoRows = '200px ';
+        } else if (usersLen < 20 && usersLen >= 15) {
+          card.style.maxWidth = '300px';
+          // container.style.gridAutoRows = '200px ';
+        } else if (usersLen >= 20) {
+          card.style.maxWidth = '250px';
+          // container.style.gridAutoRows = '200px ';
         }
-      } else if (usersLen < 5 && usersLen > 2) {
-        container.className = 'content';
-        if (userKeys[i] == this.callService.getPeer()?.id) {
-          card.style.maxWidth = '28%';
-          card.style.bottom = '';
-          card.style.right = '';
-          card.className = 'card bg-dark';
-        } else card.style.maxWidth = '28%';
-      } else if (usersLen < 10 && usersLen >= 5) {
-        card.style.maxWidth = '400px';
-        // container.style.gridAutoRows = '350px ';
-      } else if (usersLen < 15 && usersLen >= 10) {
-        card.style.maxWidth = '350px';
-        // container.style.gridAutoRows = '200px ';
-      } else if (usersLen < 20 && usersLen >= 15) {
-        card.style.maxWidth = '300px';
-        // container.style.gridAutoRows = '200px ';
-      } else if (usersLen >= 20) {
-        card.style.maxWidth = '250px';
-        // container.style.gridAutoRows = '200px ';
       }
+
       // if (usersLen < 5) {
       //   container.style.gridTemplateColumns = '1fr 1fr';
       //   container.style.gridAutoRows = '350px ';
