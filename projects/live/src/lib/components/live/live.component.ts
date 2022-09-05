@@ -193,7 +193,11 @@ export class LiveComponent implements OnInit {
         peerVideo?.remove();
         // remove the container of the user video
         document.getElementById(call.peer)?.remove();
-        // this.resizeContainer();
+        this.resizeContainer();
+        if (this.users[call.peer]) {
+          delete this.peers[call.peer];
+        }
+        call.close();
       });
       this.peers[call.peer] = call;
     });
@@ -278,7 +282,10 @@ export class LiveComponent implements OnInit {
         delete this.users[peerId];
         // remove the div container holding the details of the exiting user
         document.getElementById(peerId)?.remove();
-        // this.resizeContainer();
+        this.resizeContainer();
+        if (this.users[peerId]) {
+          delete this.peers[peerId];
+        }
       }
     });
 
@@ -450,11 +457,11 @@ export class LiveComponent implements OnInit {
       } else if (usersLen < 5 && usersLen > 2) {
         container.className = 'content';
         if (userKeys[i] == this.callService.getPeer()?.id) {
-          card.style.maxWidth = '600px';
+          card.style.maxWidth = '28%';
           card.style.bottom = '';
           card.style.right = '';
           card.className = 'card bg-dark';
-        } else card.style.maxWidth = '600px';
+        } else card.style.maxWidth = '28%';
       } else if (usersLen < 10 && usersLen >= 5) {
         card.style.maxWidth = '400px';
         // container.style.gridAutoRows = '350px ';
@@ -679,7 +686,10 @@ export class LiveComponent implements OnInit {
         userVideo?.remove();
         // remove the container of the user video
         document.getElementById(peerId)?.remove();
-        // this.resizeContainer();
+        this.resizeContainer();
+        if (this.users[peerId]) {
+          delete this.peers[peerId];
+        }
       });
       // call.peerConnection.getSenders()[0].replaceTrack();
     });
@@ -781,11 +791,12 @@ export class LiveComponent implements OnInit {
     for (let i = 0; i < usersCards.length; i++) {
       const card = usersCards.item(i) as HTMLDivElement;
       if (card?.id == peerId) {
+        console.log('presentation card: ', card);
         card.style.maxWidth = '100%';
       } else {
         card.style.maxWidth = '300px';
         otherUsersCard.append(card);
-        card.remove();
+        // card.remove();
       }
     }
     container.append(otherUsersCard);
