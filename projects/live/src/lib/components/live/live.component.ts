@@ -456,14 +456,15 @@ export class LiveComponent implements OnInit {
           }
         } else if (usersLen < 5 && usersLen > 2) {
           container.className = 'content';
+          card.removeAttribute('style');
           if (userKeys[i] == this.callService.getPeer()?.id) {
             card.style.width = '50%';
             card.style.bottom = '';
             card.style.right = '';
-            card.className = 'card bg-dark';
+            card.className = 'card bg-dark position-relative';
           } else {
             card.style.width = '50%';
-            card.className = 'card bg-dark';
+            card.className = 'card bg-dark position-relative';
           }
         } else if (usersLen < 10 && usersLen >= 5) {
           card.style.width = '32%';
