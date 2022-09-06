@@ -794,6 +794,7 @@ export class LiveComponent implements OnInit {
     const container = document.getElementById('content') as HTMLDivElement;
     const usersCards = container.getElementsByTagName('div');
     const otherUsersCard = document.createElement('div');
+    otherUsersCard.id = 'othercards';
     otherUsersCard.style.display = 'flex';
     otherUsersCard.style.gap = '5px';
     otherUsersCard.style.height = '10vh';
@@ -807,12 +808,16 @@ export class LiveComponent implements OnInit {
       } else {
         card.style.width = '300px';
         otherUsersCard.append(card);
+        console.log('non presenter card: ', card);
+
         // card.remove();
         // for (let i = 0; i < videos.length; i++) {
         usersCards[i].parentNode?.removeChild(usersCards[i]);
         // }
       }
     }
+    console.log('user cards: ', otherUsersCard);
+
     container.append(otherUsersCard);
   }
 }
