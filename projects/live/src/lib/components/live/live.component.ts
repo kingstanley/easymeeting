@@ -750,29 +750,32 @@ export class LiveComponent implements OnInit {
   async getScreenMedia() {
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia();
-      console.log('screen media: ', screenStream);
-      const track = screenStream.getVideoTracks()[0];
-      console.log('track: ', track);
-      const videoTrack = this.myStream.getVideoTracks()[0];
-      this.myStream.removeTrack(this.myStream.getVideoTracks()[0]);
-      this.myStream.addTrack(track);
-      const calls: any = Object.values(this.peers);
-      console.log('calls: ', calls);
-      for (const call of calls) {
-        call?.peerConnection
-          .getSenders()
-          .forEach((sender: any) => sender.replaceTrack(track));
-      }
-      track.onended = () => {
-        this.myStream.removeTrack(track);
-        this.myStream.addTrack(videoTrack);
-
+      console.log('share screen: ', screenStream);
+      if (screenStream.active) {
+        console.log('screen media: ', screenStream);
+        const track = screenStream.getVideoTracks()[0];
+        console.log('track: ', track);
+        const videoTrack = this.myStream.getVideoTracks()[0];
+        this.myStream.removeTrack(this.myStream.getVideoTracks()[0]);
+        this.myStream.addTrack(track);
+        const calls: any = Object.values(this.peers);
+        console.log('calls: ', calls);
         for (const call of calls) {
           call?.peerConnection
             .getSenders()
-            .forEach((sender: any) => sender.replaceTrack(videoTrack));
+            .forEach((sender: any) => sender.replaceTrack(track));
         }
-      };
+        track.onended = () => {
+          this.myStream.removeTrack(track);
+          this.myStream.addTrack(videoTrack);
+
+          for (const call of calls) {
+            call?.peerConnection
+              .getSenders()
+              .forEach((sender: any) => sender.replaceTrack(videoTrack));
+          }
+        };
+      }
     } catch (error) {
       console.log('Error in screen sharing: ', error);
     }
@@ -802,9 +805,12 @@ export class LiveComponent implements OnInit {
         console.log('presentation card: ', card);
         card.style.width = '100%';
       } else {
-        card.style.maxWidth = '300px';
+        card.style.width = '300px';
         otherUsersCard.append(card);
         // card.remove();
+        // for (let i = 0; i < videos.length; i++) {
+        usersCards[i].parentNode?.removeChild(usersCards[i]);
+        // }
       }
     }
     container.append(otherUsersCard);
