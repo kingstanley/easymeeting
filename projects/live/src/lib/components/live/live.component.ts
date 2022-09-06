@@ -751,7 +751,12 @@ export class LiveComponent implements OnInit {
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia();
       console.log('share screen: ', screenStream);
-      if (screenStream.active) {
+      if (screenStream) {
+        this.socket.emit(
+          'presentation',
+          this.callService.getPeer()?.id,
+          this.socket.ioSocket.id
+        );
         console.log('screen media: ', screenStream);
         const track = screenStream.getVideoTracks()[0];
         console.log('track: ', track);
@@ -781,11 +786,6 @@ export class LiveComponent implements OnInit {
     }
   }
   shareScreen(value?: boolean) {
-    this.socket.emit(
-      'presentation',
-      this.callService.getPeer()?.id,
-      this.socket.ioSocket.id
-    );
     this.getScreenMedia();
   }
 
