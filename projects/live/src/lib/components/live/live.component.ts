@@ -800,8 +800,10 @@ export class LiveComponent implements OnInit {
     otherUsersCard.style.height = '10vh';
     otherUsersCard.style.bottom = '0';
     otherUsersCard.style.right = '0';
-    for (let i = 0; i < usersCards.length; i++) {
-      const card = usersCards.item(i) as HTMLDivElement;
+    const usersKeys= Object.keys(this.users);
+// const userLens=usersKeys.length;
+    for (let i = 0; i < usersKeys.length; i++) {
+      const card = document.getElementById(usersKeys[i]) as HTMLDivElement;
       if (card?.id == peerId) {
         console.log('presentation card: ', card);
         card.style.width = '100%';
@@ -812,7 +814,7 @@ export class LiveComponent implements OnInit {
 
         // card.remove();
         // for (let i = 0; i < videos.length; i++) {
-        usersCards[i].parentNode?.removeChild(usersCards[i]);
+        // usersCards[i].parentNode?.removeChild(usersCards[i]);
         // }
       }
     }
