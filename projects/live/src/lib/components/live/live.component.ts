@@ -61,6 +61,7 @@ export class LiveComponent implements OnInit {
   selectedVideoDevice: ConstrainDOMString | undefined;
   wHeight: number;
   wWidth: number;
+  isPresentionMode: boolean;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -119,8 +120,10 @@ export class LiveComponent implements OnInit {
     });
     this.socket.on('presentation', (peerId: string) => {
       this.setPresentationScreen(peerId);
+      this.isPresentionMode = true;
     });
     this.socket.on('presentation-ended', (peerId: string) => {
+      this.isPresentionMode = false;
       this.resizeContainer();
     });
     console.log('io socket: ', this.chatService.Socket.ioSocket);
@@ -198,7 +201,9 @@ export class LiveComponent implements OnInit {
         peerVideo?.remove();
         // remove the container of the user video
         document.getElementById(call.peer)?.remove();
-        this.resizeContainer();
+        if (!this.isPresentionMode) {
+          this.resizeContainer();
+        }
         if (this.users[call.peer]) {
           delete this.peers[call.peer];
         }
@@ -287,7 +292,9 @@ export class LiveComponent implements OnInit {
         delete this.users[peerId];
         // remove the div container holding the details of the exiting user
         document.getElementById(peerId)?.remove();
-        this.resizeContainer();
+        if (!this.isPresentionMode) {
+          this.resizeContainer();
+        }
         if (this.users[peerId]) {
           delete this.peers[peerId];
         }
@@ -617,7 +624,12 @@ export class LiveComponent implements OnInit {
         this.addControls(userVideoExist, peerId, socketId);
       }
     }
-    this.resizeContainer();
+
+    if (!this.isPresentionMode) {
+      this.resizeContainer();
+    } else {
+      this.setPresentationScreen();
+    }
     console.log('videoGrid: ', videoGrid);
   }
   addControls(holder: HTMLDivElement, peerId: string, socketId: string) {
@@ -725,7 +737,10 @@ export class LiveComponent implements OnInit {
         userVideo?.remove();
         // remove the container of the user video
         document.getElementById(peerId)?.remove();
-        this.resizeContainer();
+
+        if (!this.isPresentionMode) {
+          this.resizeContainer();
+        }
         if (this.users[peerId]) {
           delete this.peers[peerId];
         }
