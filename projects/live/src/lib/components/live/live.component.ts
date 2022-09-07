@@ -61,7 +61,7 @@ export class LiveComponent implements OnInit {
   selectedVideoDevice: ConstrainDOMString | undefined;
   wHeight: number;
   wWidth: number;
-  isPresentionMode: boolean;
+  isPresentionMode = false;
   constructor(
     private router: Router,
     private callService: CallService,
@@ -628,7 +628,7 @@ export class LiveComponent implements OnInit {
     if (!this.isPresentionMode) {
       this.resizeContainer();
     } else {
-      this.setPresentationScreen();
+      this.setPresentationScreen(peerId);
     }
     console.log('videoGrid: ', videoGrid);
   }
