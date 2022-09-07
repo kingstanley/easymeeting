@@ -1,5 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
+import { async } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +11,7 @@ import { ChatService } from 'src/app/shared/chat.service';
 import { MeetingService } from '../../services/meeting.service';
 import { AdmitComponent } from '../admit/admit.component';
 import { SettingComponent } from '../setting/setting.component';
+import { VideoStreamMerger } from 'video-stream-merger';
 // import {request} from 'express'
 
 @Component({
@@ -117,6 +119,9 @@ export class LiveComponent implements OnInit {
     });
     this.socket.on('presentation', (peerId: string) => {
       this.setPresentationScreen(peerId);
+    });
+    this.socket.on('presentation-ended', (peerId: string) => {
+      this.resizeContainer();
     });
     console.log('io socket: ', this.chatService.Socket.ioSocket);
     this.chatService.sendMessage('hello', 'Hello server');
@@ -542,7 +547,35 @@ export class LiveComponent implements OnInit {
       video.play();
     });
     const holder = document.createElement('div');
+    holder.addEventListener('dblclick', async (evt) => {
+      console.log('requesting fullscreen with dbclick: ', evt);
+      const isFullScreen = document.fullscreenElement;
+      if (!isFullScreen) {
+        await holder.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+
+      console.log('fullscreen: ', isFullScreen);
+    });
+    holder.title = 'double click to enter or exist full screen';
     holder.className = 'card bg-dark position-relative';
+
+    const fullScreen = document.createElement('button');
+    fullScreen.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-fullscreen" viewBox="0 0 16 16">
+  <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+</svg>`;
+    const fh = document.createElement('div');
+    fh.style.bottom = '0';
+    fh.style.right = '0';
+    fh.className = 'position-absolute';
+    fullScreen.style.cursor = 'hand';
+    fullScreen.addEventListener('click', (evt) => {
+      console.log('full screen request: ', evt);
+      holder.requestFullscreen();
+    });
+    fh.append(fullScreen);
+    holder.append(fh);
     // holder.style.maxWidth = '500px';
     // check if user already added to screen. If added replace video stream
 
@@ -762,15 +795,58 @@ export class LiveComponent implements OnInit {
         console.log('track: ', track);
         const videoTrack = this.myStream.getVideoTracks()[0];
         this.myStream.removeTrack(this.myStream.getVideoTracks()[0]);
-        this.myStream.addTrack(track);
+        // this.myStream.addTrack(track);
         const calls: any = Object.values(this.peers);
         console.log('calls: ', calls);
+        const merger = new VideoStreamMerger();
+        merger.addStream(screenStream, {
+          x: 0, // position of the topleft corner
+          y: 0,
+          width: this.wWidth,
+          height: this.wHeight,
+          muted: true,
+          index: 0,
+          mute: true, // we don't want sound from the screen (if there is any)
+          draw: (ctx, frame, done) => {
+            // You can do whatever you want with this canvas context
+            ctx.drawImage(frame, 0, 0, merger.width, merger.height);
+            done();
+          },
+          audioEffect: (sourceNode, destinationNode) => {
+            sourceNode.connect(destinationNode); // The default effect, simply merges audio
+          },
+        });
+
+        // Add the webcam stream. Position it on the bottom left and resize it to 100x100.
+        merger.addStream(this.myStream, {
+          x: 0,
+          y: merger.height - 180,
+          width: 150,
+          height: 100,
+          mute: false,
+          muted: false,
+          index: 1,
+          draw: (ctx, frame, done) => {
+            ctx.drawImage(frame, 0, 0, merger.width, merger.height);
+            done();
+          },
+
+          audioEffect: (sourceNode, destinationNode) => {
+            sourceNode.connect(destinationNode); // The default effect, simply merges audio
+          },
+        });
+        merger.start();
+        const mergedStream = merger.result;
+        // if (mergedStream) {
+        // const mTrack = mergedStream.getVideoTracks()[0];
+        this.myStream.addTrack(track);
         for (const call of calls) {
           call?.peerConnection
             .getSenders()
             .forEach((sender: any) => sender.replaceTrack(track));
         }
         track.onended = () => {
+          merger.stop();
           this.myStream.removeTrack(track);
           this.myStream.addTrack(videoTrack);
 
@@ -779,7 +855,13 @@ export class LiveComponent implements OnInit {
               .getSenders()
               .forEach((sender: any) => sender.replaceTrack(videoTrack));
           }
+          this.socket.emit(
+            'presentation-ended',
+            this.callService.getPeer()?.id,
+            this.socket.ioSocket.id
+          );
         };
+        // }
       }
     } catch (error) {
       console.log('Error in screen sharing: ', error);
@@ -800,8 +882,8 @@ export class LiveComponent implements OnInit {
     otherUsersCard.style.height = '10vh';
     otherUsersCard.style.bottom = '0';
     otherUsersCard.style.right = '0';
-    const usersKeys= Object.keys(this.users);
-// const userLens=usersKeys.length;
+    const usersKeys = Object.keys(this.users);
+    // const userLens=usersKeys.length;
     for (let i = 0; i < usersKeys.length; i++) {
       const card = document.getElementById(usersKeys[i]) as HTMLDivElement;
       if (card?.id == peerId) {
